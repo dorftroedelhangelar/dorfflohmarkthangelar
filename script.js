@@ -251,3 +251,11 @@ document.getElementById("btnRoute").addEventListener("click", async () => {
 
 ladeEinstellungen();
 ladeStaende();
+document.getElementById("btnListe").addEventListener("click", () => {
+
+    document.querySelector(".standliste").scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+    });
+
+});
