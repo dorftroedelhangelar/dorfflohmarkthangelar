@@ -109,6 +109,7 @@ font-weight:bold;
         markerListe.push(marker);
 
         const zeile = document.createElement("tr");
+        zeile.dataset.warengruppe = (stand.warengruppe || "").toLowerCase();
 
         zeile.innerHTML = `
             <td>${stand.standnummer}</td>
@@ -139,7 +140,7 @@ font-weight:bold;
     });
 
 }
-ladeStaende();
+
 
 document.getElementById("search").addEventListener("input", function () {
 
@@ -197,32 +198,36 @@ document.getElementById("search").addEventListener("input", function () {
 
 });
 
-function filterWarengruppe(gruppe) {
+function filterWarengruppe(gruppe){
 
-    markerListe.forEach(marker => {
+    gruppe = gruppe.toLowerCase();
 
-        const warengruppen = (marker.stand.warengruppe || "").toLowerCase();
+    const zeilen = document.querySelectorAll("#standTable tbody tr");
 
-        if (gruppe.toLowerCase() === "alle") {
+    markerListe.forEach((marker,index)=>{
 
-            if (!map.hasLayer(marker)) {
+        const warengruppe =
+            (marker.stand.warengruppe || "").toLowerCase();
+
+        const sichtbar =
+            gruppe==="alle" ||
+            warengruppe.includes(gruppe);
+
+        if(sichtbar){
+
+            if(!map.hasLayer(marker)){
                 marker.addTo(map);
             }
 
-            return;
-        }
+            zeilen[index].style.display="";
 
-        if (warengruppen.includes(gruppe.toLowerCase())) {
+        }else{
 
-            if (!map.hasLayer(marker)) {
-                marker.addTo(map);
-            }
-
-        } else {
-
-            if (map.hasLayer(marker)) {
+            if(map.hasLayer(marker)){
                 map.removeLayer(marker);
             }
+
+            zeilen[index].style.display="none";
 
         }
 

@@ -14,35 +14,53 @@
 
 <body>
 
-<header>
 
-    <h1 id="veranstaltung">
-        🏡 Dorfflohmarkt Hangelar
-    </h1>
+    <header class="hero">
 
-    <p id="datum">
-        Datum wird geladen...
-    </p>
+    <div class="hero-content">
 
-    <p id="uhrzeit">
-    </p>
+        <h1 id="veranstaltung">
+            🏡 Dorfflohmarkt Hangelar
+        </h1>s
 
-    <p id="anzahlStaende"></p>
+        <div class="event-info">
+
+            <div class="info-box">
+                <span>📅</span>
+                <p id="datum"></p>
+            </div>
+
+            <div class="info-box">
+                <span>🕙</span>
+                <p id="uhrzeit"></p>
+            </div>
+
+            <div class="info-box info-green">
+                <span>📍</span>
+                <p id="anzahlStaende"></p>
+            </div>
+
+        </div>
+
+        <section class="toolbar">
+
+            <input
+                id="search"
+                type="text"
+                placeholder="🔍 Straße, Stand oder Warengruppe suchen">
+
+            <button id="btnRoute">
+                🔄 Karte aktualisieren
+            </button>
+
+        </section>
+
+    </div>
 
 </header>
 
-<section class="toolbar">
 
-    <input
-        id="search"
-        type="text"
-        placeholder="🔍 Straße, Stand oder Warengruppe suchen">
 
-    <button id="btnRoute">
-        🔄 Karte aktualisieren
-    </button>
-
-</section>
 
 <div id="filterBar" class="filter-bar">
 
