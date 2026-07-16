@@ -259,3 +259,16 @@ document.getElementById("btnListe").addEventListener("click", () => {
     });
 
 });
+// ESC leert das Suchfeld
+document.getElementById("search").addEventListener("keydown", function (e) {
+
+    if (e.key === "Escape") {
+
+        this.value = "";
+
+        // Suchfunktion erneut auslösen
+        this.dispatchEvent(new Event("input"));
+
+    }
+
+});
