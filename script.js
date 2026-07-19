@@ -156,69 +156,73 @@ transition:0.2s;
     });
 
 }
-
 document.getElementById("search").addEventListener("input", function () {
 
     const text = this.value.toLowerCase().trim();
 
-    if (text === "") {
-
-        document
-            .querySelectorAll("#standTable tbody tr")
-            .forEach(z => z.classList.remove("aktiv"));
-
-        return;
-
-    }
-const marker = markerListe.find(m => {
-
-    const s = m.stand;
-
-    const suchtext = [
-        s.standnummer,
-        s.strasse,
-        s.hausnummer,
-        s.warengruppe,
-        s.beschreibung
-    ]
-        .join(" ")
-        .toLowerCase();
-
-    const begriffe = text.split(/\s+/);
-
-    return begriffe.every(begriff => suchtext.includes(begriff));
-
-});
-
-    if (!marker) return;
-
-    map.setView(marker.getLatLng(), 18);
-
-    marker.openPopup();
-
+    // Alte Markierungen entfernen
     document
         .querySelectorAll("#standTable tbody tr")
         .forEach(z => z.classList.remove("aktiv"));
 
+    if (text === "") {
+        return;
+    }
+
+    const begriffe = text.split(/\s+/);
+
+    const treffer = markerListe.filter(m => {
+
+        const s = m.stand;
+
+        const suchtext = [
+            s.standnummer,
+            s.strasse,
+            s.hausnummer,
+            s.warengruppe,
+            s.beschreibung
+        ]
+        .join(" ")
+        .toLowerCase();
+
+        return begriffe.every(begriff => suchtext.includes(begriff));
+
+    });
+
+    if (treffer.length === 0) {
+        return;
+    }
+
+    // Alle passenden Tabellenzeilen markieren
     document
         .querySelectorAll("#standTable tbody tr")
         .forEach(z => {
 
-            if (z.cells[0].textContent == marker.stand.standnummer) {
-
+            if (treffer.some(t => t.stand.standnummer == z.cells[0].textContent)) {
                 z.classList.add("aktiv");
-
-                z.scrollIntoView({
-                    behavior: "smooth",
-                    block: "center"
-                });
-
             }
 
         });
 
+    // Nur ein Treffer → Popup öffnen
+    if (treffer.length === 1) {
+
+        map.setView(treffer[0].getLatLng(), 18);
+        treffer[0].openPopup();
+        return;
+
+    }
+
+    // Mehrere Treffer → auf alle zoomen
+    const gruppe = L.featureGroup(treffer);
+
+    map.fitBounds(gruppe.getBounds(), {
+        padding: [40, 40]
+    });
 
 });
+
+   
 
 function filterWarengruppe(gruppe){
 
