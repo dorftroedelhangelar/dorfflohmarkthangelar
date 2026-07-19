@@ -157,7 +157,6 @@ transition:0.2s;
 
 }
 
-
 document.getElementById("search").addEventListener("input", function () {
 
     const text = this.value.toLowerCase().trim();
@@ -171,19 +170,25 @@ document.getElementById("search").addEventListener("input", function () {
         return;
 
     }
+const marker = markerListe.find(m => {
 
-    const marker = markerListe.find(m => {
+    const s = m.stand;
 
-        const s = m.stand;
+    const suchtext = [
+        s.standnummer,
+        s.strasse,
+        s.hausnummer,
+        s.warengruppe,
+        s.beschreibung
+    ]
+        .join(" ")
+        .toLowerCase();
 
-        return (
-            String(s.standnummer).includes(text) ||
-            (s.strasse || "").toLowerCase().includes(text) ||
-            (s.warengruppe || "").toLowerCase().includes(text) ||
-            (s.beschreibung || "").toLowerCase().includes(text)
-        );
+    const begriffe = text.split(/\s+/);
 
-    });
+    return begriffe.every(begriff => suchtext.includes(begriff));
+
+});
 
     if (!marker) return;
 
@@ -211,6 +216,7 @@ document.getElementById("search").addEventListener("input", function () {
             }
 
         });
+
 
 });
 
