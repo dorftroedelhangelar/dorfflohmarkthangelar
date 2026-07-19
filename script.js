@@ -60,28 +60,42 @@ async function ladeStaende() {
             }
         ).addTo(map);
 
-        marker.bindPopup(`
-<div style="min-width:230px">
+       marker.bindPopup(`
+<div style="
+    min-width:250px;
+    font-family:Arial,Helvetica,sans-serif;
+    line-height:1.5;
+">
 
-<h3 style="margin:0;color:#2e7d32;">
+<div style="
+    font-size:18px;
+    font-weight:bold;
+    color:#2e7d32;
+    margin-bottom:8px;
+">
 🏡 Stand ${stand.standnummer}
-</h3>
+</div>
 
-<p>
-<b>📍 ${stand.strasse} ${stand.hausnummer}</b><br>
+<div style="margin-bottom:12px;">
+📍 <b>${stand.strasse} ${stand.hausnummer}</b><br>
 ${stand.plz} ${stand.ort}
-</p>
+</div>
 
-<p>
-<b>🛍 Warengruppe</b><br>
+<div style="margin-bottom:12px;">
+🛍 <b>Warengruppe</b><br>
 ${stand.warengruppe || "-"}
-</p>
+</div>
 
 ${stand.beschreibung ? `
-<p>
-<b>📝 Beschreibung</b><br>
+<div style="
+    margin-bottom:12px;
+    padding:8px;
+    background:#f5f5f5;
+    border-radius:8px;
+">
+📝 <b>Beschreibung</b><br>
 ${stand.beschreibung}
-</p>
+</div>
 ` : ""}
 
 <a
@@ -91,13 +105,15 @@ href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
 target="_blank"
 style="
 display:block;
-padding:10px;
+padding:12px;
 background:#2e7d32;
 color:white;
 text-align:center;
 text-decoration:none;
-border-radius:6px;
+border-radius:8px;
 font-weight:bold;
+font-size:15px;
+transition:0.2s;
 ">
 🧭 Route starten
 </a>
