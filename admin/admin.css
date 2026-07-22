@@ -1,0 +1,111 @@
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial, Helvetica, sans-serif;
+}
+
+body{
+    background:#f4f6f8;
+}
+
+.layout{
+    display:flex;
+    min-height:100vh;
+}
+
+/* Sidebar */
+
+.sidebar{
+    width:240px;
+    background:#2d6a4f;
+    color:white;
+    display:flex;
+    flex-direction:column;
+    padding:20px;
+}
+
+.logo{
+    text-align:center;
+    font-size:22px;
+    font-weight:bold;
+    margin-bottom:40px;
+    line-height:1.5;
+}
+
+.logo span{
+    font-size:18px;
+}
+
+nav{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+}
+
+.menu{
+    background:none;
+    border:none;
+    color:white;
+    text-align:left;
+    padding:12px 15px;
+    border-radius:8px;
+    cursor:pointer;
+    font-size:16px;
+    transition:0.2s;
+}
+
+.menu:hover{
+    background:rgba(255,255,255,.15);
+}
+
+.menu.active{
+    background:white;
+    color:#2d6a4f;
+    font-weight:bold;
+}
+
+.back{
+    margin-top:auto;
+    text-decoration:none;
+    color:white;
+    padding:12px;
+    border-radius:8px;
+    text-align:center;
+    border:1px solid rgba(255,255,255,.3);
+}
+
+.back:hover{
+    background:rgba(255,255,255,.15);
+}
+
+/* Inhalt */
+
+main{
+    flex:1;
+    padding:40px;
+}
+
+h1{
+    margin-bottom:20px;
+    color:#2d6a4f;
+}
+
+p{
+    font-size:18px;
+    color:#555;
+}
+
+/* Smartphone */
+
+@media(max-width:800px){
+
+.layout{
+    flex-direction:column;
+}
+
+.sidebar{
+    width:100%;
+}
+
+}
