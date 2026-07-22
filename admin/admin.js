@@ -1,75 +1,112 @@
-document.querySelectorAll(".menu").forEach(button => {
+let verkaeufer = [];
 
-    button.addEventListener("click", () => {
+async function ladeVerkaeufer() {
 
-        document
-            .querySelectorAll(".menu")
-            .forEach(btn => btn.classList.remove("active"));
+    try {
 
-        button.classList.add("active");
+        const response = await fetch(DATA_URL);
+        verkaeufer = await response.json();
 
-        const page = button.dataset.page;
-        const content = document.getElementById("content");
+       zeigeVerkaeufer(verkaeufer);
 
-        switch(page){
+document.getElementById("search").addEventListener("input", sucheVerkaeufer);
 
-            case "dashboard":
+    } catch(err) {
 
-                content.innerHTML = `
-                    <h1>Dashboard</h1>
-                    <p>Hier erscheint später die Übersicht.</p>
-                `;
-                break;
+        console.error(err);
 
-            case "verkaeufer":
+    }
 
-                content.innerHTML = `
-                    <h1>Verkäufer</h1>
+}
 
-                    <input
-                        type="text"
-                        placeholder="Verkäufer suchen..."
-                        style="
-                            width:100%;
-                            max-width:450px;
-                            padding:12px;
-                            font-size:16px;
-                            margin-top:15px;
-                        "
-                    >
+function zeigeVerkaeufer(liste){
 
-                    <p style="margin-top:30px;">
-                        Die Verkäuferverwaltung entsteht im nächsten Schritt.
-                    </p>
-                `;
-                break;
+    const container = document.getElementById("sellerList");
 
-            case "mail":
+    container.innerHTML = "";
 
-                content.innerHTML = `
-                    <h1>Rundmails</h1>
-                    <p>Modul folgt.</p>
-                `;
-                break;
+    liste.forEach((person,index) => {
 
-            case "abstimmung":
+        const div = document.createElement("div");
 
-                content.innerHTML = `
-                    <h1>Abstimmungen</h1>
-                    <p>Modul folgt.</p>
-                `;
-                break;
+        div.className = "seller-item";
 
-            case "einstellungen":
+        div.innerHTML = `
+            <strong>${person.nachname}</strong>
+            ${person.strasse} ${person.hausnummer}
+        `;
 
-                content.innerHTML = `
-                    <h1>Einstellungen</h1>
-                    <p>Modul folgt.</p>
-                `;
-                break;
+        div.onclick = () => zeigeDetails(person, div);
 
-        }
+        container.appendChild(div);
 
     });
 
-});
+}
+function zeigeDetails(person, element){
+
+    document.querySelectorAll(".seller-item")
+        .forEach(e => e.classList.remove("active"));
+
+    element.classList.add("active");
+
+    document.querySelector(".seller-details").innerHTML = `
+
+        <h2>${person.nachname}</h2>
+
+        <table>
+
+            <tr>
+                <td>Straße</td>
+                <td>${person.strasse} ${person.hausnummer}</td>
+            </tr>
+
+            <tr>
+                <td>PLZ / Ort</td>
+                <td>${person.plz} ${person.ort}</td>
+            </tr>
+
+            <tr>
+                <td>Warengruppe</td>
+                <td>${person.warengruppe}</td>
+            </tr>
+
+            <tr>
+                <td>Beschreibung</td>
+                <td>${person.beschreibung || "-"}</td>
+            </tr>
+
+            <tr>
+                <td>Stand</td>
+                <td>${person.standnummer}</td>
+            </tr>
+
+        </table>
+
+    `;
+
+}
+function sucheVerkaeufer() {
+
+    const suchtext = document
+        .getElementById("search")
+        .value
+        .toLowerCase()
+        .trim();
+
+    const treffer = verkaeufer.filter(person => {
+
+        return (
+            person.nachname.toLowerCase().includes(suchtext) ||
+            person.strasse.toLowerCase().includes(suchtext) ||
+            (person.beschreibung || "").toLowerCase().includes(suchtext) ||
+            person.warengruppe.toLowerCase().includes(suchtext)
+        );
+
+    });
+
+    zeigeVerkaeufer(treffer);
+
+}
+
+ladeVerkaeufer();

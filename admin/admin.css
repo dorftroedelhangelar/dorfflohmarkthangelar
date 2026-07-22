@@ -109,3 +109,77 @@ p{
 }
 
 }
+/* ==========================
+   Verkäuferverwaltung
+========================== */
+
+.seller-layout{
+    display:grid;
+    grid-template-columns:350px 1fr;
+    gap:25px;
+    margin-top:25px;
+}
+
+.seller-list,
+.seller-details{
+    background:#fff;
+    border-radius:10px;
+    padding:20px;
+    box-shadow:0 2px 8px rgba(0,0,0,.08);
+}
+
+#search{
+    width:100%;
+    padding:12px;
+    font-size:15px;
+    border:1px solid #ccc;
+    border-radius:8px;
+    margin-bottom:20px;
+}
+
+.seller-item{
+    padding:12px;
+    border-bottom:1px solid #eee;
+    cursor:pointer;
+    transition:.2s;
+}
+
+.seller-item:hover{
+    background:#f4f6f8;
+}
+
+.seller-item.active{
+    background:#e9f5ef;
+    border-left:4px solid #2d6a4f;
+}
+
+.seller-item strong{
+    display:block;
+    color:#2d6a4f;
+}
+
+.seller-details table{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:20px;
+}
+
+.seller-details td{
+    padding:10px 0;
+    border-bottom:1px solid #eee;
+    vertical-align:top;
+}
+
+.seller-details td:first-child{
+    width:170px;
+    font-weight:bold;
+    color:#2d6a4f;
+}
+
+@media(max-width:900px){
+
+    .seller-layout{
+        grid-template-columns:1fr;
+    }
+
+}
