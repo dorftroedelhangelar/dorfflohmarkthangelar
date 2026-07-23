@@ -183,3 +183,17 @@ p{
     }
 
 }
+.maps-link {
+    display: inline-block;
+    margin-top: 15px;
+    padding: 10px 16px;
+    background: #2e7d32;
+    color: white;
+    text-decoration: none;
+    border-radius: 6px;
+    font-weight: bold;
+}
+
+.maps-link:hover {
+    background: #1b5e20;
+}

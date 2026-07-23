@@ -81,7 +81,16 @@ function zeigeDetails(person, element){
                 <td>${person.standnummer}</td>
             </tr>
 
+
         </table>
+        <br>
+
+<a
+    href="https://www.google.com/maps?q=${person.breitengrad},${person.laengengrad}"
+    target="_blank"
+    class="maps-link">
+    🗺️ In Google Maps öffnen
+</a>
 
     `;
 
@@ -110,3 +119,35 @@ function sucheVerkaeufer() {
 }
 
 ladeVerkaeufer();
+document.querySelectorAll(".menu").forEach(button => {
+
+    button.addEventListener("click", () => {
+
+        const page = button.dataset.page;
+
+        switch (page) {
+
+            case "dashboard":
+                window.location.href = "index.html";
+                break;
+
+            case "verkaeufer":
+                window.location.href = "verkaeufer.html";
+                break;
+
+            case "mail":
+                window.location.href = "rundmails.html";
+                break;
+
+            case "abstimmung":
+                window.location.href = "abstimmungen.html";
+                break;
+
+            case "einstellungen":
+                window.location.href = "einstellungen.html";
+                break;
+        }
+
+    });
+
+});
