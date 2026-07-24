@@ -6,6 +6,9 @@ async function ladeVerkaeufer() {
 
         const response = await fetch(DATA_URL);
         verkaeufer = await response.json();
+      verkaeufer.sort((a, b) =>
+    a.nachname.localeCompare(b.nachname, "de")
+);
 
        zeigeVerkaeufer(verkaeufer);
 
@@ -23,7 +26,10 @@ function zeigeVerkaeufer(liste){
 
     const container = document.getElementById("sellerList");
 
-    container.innerHTML = "";
+document.getElementById("anzahlVerkaeufer").textContent =
+    `${liste.length} Verkäufer gefunden`;
+
+container.innerHTML = "";
 
     liste.forEach((person,index) => {
 
@@ -41,6 +47,8 @@ function zeigeVerkaeufer(liste){
         container.appendChild(div);
 
     });
+    
+aktualisiereStatistik(liste);
 
 }
 function zeigeDetails(person, element){
@@ -84,13 +92,18 @@ function zeigeDetails(person, element){
 
         </table>
         <br>
-
-<a
+       <a
     href="https://www.google.com/maps?q=${person.breitengrad},${person.laengengrad}"
     target="_blank"
     class="maps-link">
     🗺️ In Google Maps öffnen
 </a>
+
+<br><br>
+
+<button id="btnBearbeiten" class="edit-btn">
+    ✏️ Verkäufer bearbeiten
+</button> 
 
     `;
 
@@ -115,6 +128,35 @@ function sucheVerkaeufer() {
     });
 
     zeigeVerkaeufer(treffer);
+
+}
+function aktualisiereStatistik(liste){
+
+    const statistik = {};
+
+    liste.forEach(person => {
+
+        const gruppe = person.warengruppe || "Sonstige";
+
+        statistik[gruppe] = (statistik[gruppe] || 0) + 1;
+
+    });
+
+    let html = "";
+
+    Object.keys(statistik)
+        .sort()
+        .forEach(gruppe => {
+
+            html += `
+                <div>
+                    ${gruppe}: <strong>${statistik[gruppe]}</strong>
+                </div>
+            `;
+
+        });
+
+    document.getElementById("statistik").innerHTML = html;
 
 }
 
