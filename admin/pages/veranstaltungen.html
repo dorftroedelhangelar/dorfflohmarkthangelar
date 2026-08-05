@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+
+    <meta charset="UTF-8">
+    <title>Veranstaltungen</title>
+
+    <link rel="stylesheet" href="veranstaltungen.css">
+
+</head>
+
+<body>
+
+    <h1>Veranstaltungen</h1>
+    <div style="margin-bottom:15px;">
+    <button id="btnNeu">➕ Neue Veranstaltung</button>
+</div>
+
+    <table border="1" id="tblVeranstaltungen">
+
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Datum</th>
+                <th>Beginn</th>
+                <th>Ende</th>
+                <th>Ort</th>
+                <th>Status</th>
+                <th>Aktionen</th>
+            </tr>
+        </thead>
+
+        <tbody>
+        </tbody>
+
+    </table>
+<div id="fensterNeueVeranstaltung" style="display:none;">
+            
+
+    <h2>Neue Veranstaltung</h2>
+
+    <p>
+        <label>Name:</label><br>
+        <input type="text" id="txtName" style="width:300px;">
+    </p>
+
+    <p>
+        <label>Datum:</label><br>
+        <input type="date" id="txtDatum">
+    </p>
+
+<p>
+    <label>Ort:</label><br>
+    <input type="text" id="txtOrt" style="width:300px;">
+</p>
+<p>
+    <label>Beginn:</label><br>
+    <input type="time" id="txtBeginn">
+</p>
+<p>
+    <label>Ende:</label><br>
+    <input type="time" id="txtEnde">
+</p>
+<p>
+    <label>Status:</label><br>
+
+    <select id="txtStatus">
+
+        <option value="Vorbereitung">Vorbereitung</option>
+        <option value="Anmeldung">Anmeldung</option>
+        <option value="Abgeschlossen">Abgeschlossen</option>
+
+    </select>
+
+</p>
+
+<div style="margin-top:20px; text-align:right;">
+
+    <button id="btnAbbrechen">
+        ❌ Abbrechen
+    </button>
+    <button id="btnSpeichern">
+    💾 Speichern
+</button>
+
+</div>
+    
+
+</div>
+
+<script src="veranstaltungen.js"></script>
+
+</body>
+</html>
