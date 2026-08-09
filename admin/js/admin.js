@@ -1,4 +1,6 @@
 let verkaeufer = [];
+let aktiverVerkaeufer = null;
+let aktivesElement = null;
 
 async function ladeVerkaeufer() {
 
@@ -52,11 +54,14 @@ aktualisiereStatistik(liste);
 
 }
 function zeigeDetails(person, element = null){
-
+    aktiverVerkaeufer = person;
+    aktivesElement = element;
     document.querySelectorAll(".seller-item")
         .forEach(e => e.classList.remove("active"));
 
+    if (element) {
     element.classList.add("active");
+}
 
     document.querySelector(".seller-details").innerHTML = `
 
@@ -118,6 +123,29 @@ function zeigeDetails(person, element = null){
 </button> 
 
     `;
+    const btn = document.getElementById("btnBearbeiten");
+
+if (btn) {
+    btn.onclick = bearbeiteVerkaeufer;
+}
+
+}
+function bearbeiteVerkaeufer() {
+
+    const neuerName = prompt(
+        "Nachname bearbeiten:",
+        aktiverVerkaeufer.nachname
+    );
+
+    if (neuerName === null) return;
+
+    aktiverVerkaeufer.nachname = neuerName;
+
+    if (aktivesElement) {
+        aktivesElement.querySelector("strong").textContent = neuerName;
+    }
+
+    zeigeDetails(aktiverVerkaeufer, aktivesElement);
 
 }
 function sucheVerkaeufer() {
@@ -148,9 +176,17 @@ function aktualisiereStatistik(liste){
 
     liste.forEach(person => {
 
-        const gruppe = person.warengruppe || "Sonstige";
+        const gruppen = (person.warengruppe || "Sonstige")
+            .split(",")
+            .map(g => g.trim());
 
-        statistik[gruppe] = (statistik[gruppe] || 0) + 1;
+        gruppen.forEach(gruppe => {
+
+            if (!gruppe) return;
+
+            statistik[gruppe] = (statistik[gruppe] || 0) + 1;
+
+        });
 
     });
 
@@ -161,15 +197,17 @@ function aktualisiereStatistik(liste){
         .forEach(gruppe => {
 
             html += `
-                <div>
-                    ${gruppe}: <strong>${statistik[gruppe]}</strong>
+                <div class="stat-card">
+                    <span class="stat-name">${gruppe}</span>
+                    <span class="stat-count">${statistik[gruppe]}</span>
                 </div>
             `;
 
         });
 
     document.getElementById("statistik").innerHTML = html;
-    }
+
+}
 
 window.addEventListener("DOMContentLoaded", () => {
 
