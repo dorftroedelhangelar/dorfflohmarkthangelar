@@ -139,7 +139,23 @@ function bearbeiteVerkaeufer() {
 
     if (neuerName === null) return;
 
+    const neueEmail = prompt(
+        "E-Mail bearbeiten:",
+        aktiverVerkaeufer.email || ""
+    );
+
+    if (neueEmail === null) return;
+
+    const neueBeschreibung = prompt(
+        "Beschreibung bearbeiten:",
+        aktiverVerkaeufer.beschreibung || ""
+    );
+
+    if (neueBeschreibung === null) return;
+
     aktiverVerkaeufer.nachname = neuerName;
+    aktiverVerkaeufer.email = neueEmail;
+    aktiverVerkaeufer.beschreibung = neueBeschreibung;
 
     if (aktivesElement) {
         aktivesElement.querySelector("strong").textContent = neuerName;
