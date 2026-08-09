@@ -112,6 +112,7 @@ function zeigeDetails(person, element = null){
 
 <br><br>
 
+
 <button id="btnBearbeiten" class="edit-btn">
     ✏️ Verkäufer bearbeiten
 </button> 
@@ -168,38 +169,42 @@ function aktualisiereStatistik(liste){
         });
 
     document.getElementById("statistik").innerHTML = html;
+    }
 
-}
+window.addEventListener("DOMContentLoaded", () => {
 
-ladeVerkaeufer();
-document.querySelectorAll(".menu").forEach(button => {
+    ladeVerkaeufer();
 
-    button.addEventListener("click", () => {
+    document.querySelectorAll(".menu").forEach(button => {
 
-        const page = button.dataset.page;
+        button.addEventListener("click", () => {
 
-        switch (page) {
+            const page = button.dataset.page;
 
-            case "dashboard":
-                window.location.href = "index.html";
-                break;
+            switch (page) {
 
-            case "verkaeufer":
-                window.location.href = "verkaeufer.html";
-                break;
+                case "dashboard":
+                    window.location.href = "index.html";
+                    break;
 
-            case "mail":
-                window.location.href = "rundmails.html";
-                break;
+                case "verkaeufer":
+                    window.location.href = "verkaeufer.html";
+                    break;
 
-            case "abstimmung":
-                window.location.href = "abstimmungen.html";
-                break;
+                case "mail":
+                    window.location.href = "rundmails.html";
+                    break;
 
-            case "einstellungen":
-                window.location.href = "einstellungen.html";
-                break;
-        }
+                case "abstimmung":
+                    window.location.href = "abstimmungen.html";
+                    break;
+
+                case "einstellungen":
+                    window.location.href = "einstellungen.html";
+                    break;
+            }
+
+              });
 
     });
 
