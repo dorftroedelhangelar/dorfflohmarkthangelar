@@ -51,7 +51,7 @@ container.innerHTML = "";
 aktualisiereStatistik(liste);
 
 }
-function zeigeDetails(person, element){
+function zeigeDetails(person, element = null){
 
     document.querySelectorAll(".seller-item")
         .forEach(e => e.classList.remove("active"));
@@ -73,6 +73,17 @@ function zeigeDetails(person, element){
                 <td>PLZ / Ort</td>
                 <td>${person.plz} ${person.ort}</td>
             </tr>
+
+<tr>
+    <td>E-Mail</td>
+    <td>${person.email || "-"}</td>
+</tr>
+
+<tr>
+    <td>Anmeldeweg</td>
+    <td>${person.anmeldeweg || "Formular"}</td>
+</tr>
+
 
             <tr>
                 <td>Warengruppe</td>
