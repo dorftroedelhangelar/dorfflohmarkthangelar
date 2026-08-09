@@ -146,6 +146,13 @@ function bearbeiteVerkaeufer() {
 
     if (neueEmail === null) return;
 
+    const neueWarengruppe = prompt(
+        "Warengruppen bearbeiten (mit Komma trennen):",
+        aktiverVerkaeufer.warengruppe || ""
+    );
+
+    if (neueWarengruppe === null) return;
+
     const neueBeschreibung = prompt(
         "Beschreibung bearbeiten:",
         aktiverVerkaeufer.beschreibung || ""
@@ -155,6 +162,7 @@ function bearbeiteVerkaeufer() {
 
     aktiverVerkaeufer.nachname = neuerName;
     aktiverVerkaeufer.email = neueEmail;
+    aktiverVerkaeufer.warengruppe = neueWarengruppe;
     aktiverVerkaeufer.beschreibung = neueBeschreibung;
 
     if (aktivesElement) {
