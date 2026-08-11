@@ -6,7 +6,7 @@ async function ladeVerkaeufer() {
 
     try {
 
-        const response = await fetch(DATA_URL);
+        const response = await fetch(DATA_URL + "?format=json");
         verkaeufer = await response.json();
       verkaeufer.sort((a, b) =>
     a.nachname.localeCompare(b.nachname, "de")
@@ -130,7 +130,7 @@ if (btn) {
 }
 
 }
-function bearbeiteVerkaeufer() {
+async function bearbeiteVerkaeufer() {
 
     const neuerName = prompt(
         "Nachname bearbeiten:",
@@ -140,7 +140,7 @@ function bearbeiteVerkaeufer() {
     if (neuerName === null) return;
 
     const neueEmail = prompt(
-        "E-Mail bearbeiten:",
+        "E-Mail-Adresse bearbeiten:",
         aktiverVerkaeufer.email || ""
     );
 
@@ -160,18 +160,48 @@ function bearbeiteVerkaeufer() {
 
     if (neueBeschreibung === null) return;
 
-    aktiverVerkaeufer.nachname = neuerName;
-    aktiverVerkaeufer.email = neueEmail;
-    aktiverVerkaeufer.warengruppe = neueWarengruppe;
-    aktiverVerkaeufer.beschreibung = neueBeschreibung;
+    try {
 
-    if (aktivesElement) {
-        aktivesElement.querySelector("strong").textContent = neuerName;
+        const url =
+            DATA_URL +
+            "?format=updateVerkaeufer" +
+            "&id=" + encodeURIComponent(aktiverVerkaeufer.id) +
+            "&nachname=" + encodeURIComponent(neuerName) +
+            "&email=" + encodeURIComponent(neueEmail) +
+            "&warengruppe=" + encodeURIComponent(neueWarengruppe) +
+            "&beschreibung=" + encodeURIComponent(neueBeschreibung);
+
+        const response = await fetch(url);
+        const ergebnis = await response.text();
+
+        if (ergebnis !== "OK") {
+            throw new Error(ergebnis);
+        }
+
+        aktiverVerkaeufer.nachname = neuerName;
+        aktiverVerkaeufer.email = neueEmail;
+        aktiverVerkaeufer.warengruppe = neueWarengruppe;
+        aktiverVerkaeufer.beschreibung = neueBeschreibung;
+
+        if (aktivesElement) {
+            aktivesElement.querySelector("strong").textContent = neuerName;
+        }
+
+        zeigeDetails(aktiverVerkaeufer, aktivesElement);
+
+        alert("Änderungen wurden gespeichert.");
+
+    } catch (err) {
+
+        console.error(err);
+        alert("Fehler: " + err.message);
+
     }
 
-    zeigeDetails(aktiverVerkaeufer, aktivesElement);
-
 }
+
+
+
 function sucheVerkaeufer() {
 
     const suchtext = document
