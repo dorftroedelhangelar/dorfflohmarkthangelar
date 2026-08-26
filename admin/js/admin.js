@@ -2,6 +2,40 @@ let verkaeufer = [];
 let aktiverVerkaeufer = null;
 let aktivesElement = null;
 
+async function ladeDashboard() {
+
+    try {
+
+        // Aktuelle Veranstaltung laden
+        const settingsResponse = await fetch(
+            DATA_URL.replace("format=json", "format=settings")
+        );
+
+        const settings = await settingsResponse.json();
+
+        document.getElementById("dashboardVeranstaltung").textContent =
+            settings.Veranstaltung || "Keine Veranstaltung veröffentlicht";
+
+        document.getElementById("dashboardDatum").textContent =
+            "📅 " + (settings.Datum || "-");
+
+        document.getElementById("dashboardUhrzeit").textContent =
+            "🕙 " + (settings.Uhrzeit || "-");
+
+
+     
+
+
+    } catch (err) {
+
+        console.error(
+            "Fehler beim Laden des Dashboards:",
+            err
+        );
+
+    }
+
+}
 async function ladeVerkaeufer() {
 
     try {
@@ -266,6 +300,7 @@ function aktualisiereStatistik(liste){
 window.addEventListener("DOMContentLoaded", () => {
 
     ladeVerkaeufer();
+        ladeDashboard();
 
     document.querySelectorAll(".menu").forEach(button => {
 
@@ -278,6 +313,10 @@ window.addEventListener("DOMContentLoaded", () => {
                 case "dashboard":
                     window.location.href = "index.html";
                     break;
+
+                    case "veranstaltungen":
+    window.location.href = "veranstaltungen.html";
+    break;
 
                 case "verkaeufer":
                     window.location.href = "verkaeufer.html";

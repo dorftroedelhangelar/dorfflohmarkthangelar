@@ -1,28 +1,41 @@
 <!DOCTYPE html>
 <html lang="de">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Dorfflohmarkt Hangelar – Verwaltung</title>
 
-    <link rel="stylesheet" href="admin.css">
+    <link rel="stylesheet" href="../css/admin.css">
 </head>
 
 <body>
 
 <div class="layout">
 
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
+
     <aside class="sidebar">
 
         <div class="logo">
-            🏡<br>
-            <span>Dorfflohmarkt<br>Hangelar</span>
+            🏡
+            <span>
+                Dorfflohmarkt<br>
+                Hangelar
+            </span>
         </div>
 
         <nav>
 
             <button class="menu active" data-page="dashboard">
                 🏠 Dashboard
+            </button>
+
+            <button class="menu" data-page="veranstaltungen">
+                📅 Veranstaltungen
             </button>
 
             <button class="menu" data-page="verkaeufer">
@@ -43,26 +56,242 @@
 
         </nav>
 
-        <a href="../index.html" class="back">
+        <a href="../../index.html" class="back">
             ⬅ Besucherkarte
         </a>
 
     </aside>
 
 
+    <!-- =====================================================
+         HAUPTBEREICH
+    ====================================================== -->
+
     <main id="content">
 
-    <h1>Willkommen</h1>
+        <div class="dashboard-header">
 
-    <p>
-        Willkommen im Verwaltungsbereich des Dorfflohmarkts.
-    </p>
+            <div>
+                <h1>Willkommen 👋</h1>
 
-</main>
+                <p>
+                    Verwaltungsbereich des Dorfflohmarkts Hangelar
+                </p>
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             AKTUELLE VERANSTALTUNG
+        ================================================== -->
+
+        <section class="dashboard-event card">
+
+            <div class="dashboard-section-title">
+                <span>📅</span>
+
+                <div>
+                    <h2>Aktuelle Veranstaltung</h2>
+
+                    <p>
+                        Übersicht über den aktuell veröffentlichten Flohmarkt
+                    </p>
+                </div>
+            </div>
+
+
+           <div class="event-placeholder">
+
+    <div class="event-icon">
+        🏡
+    </div>
+
+    <div>
+
+        <h3 id="dashboardVeranstaltung">
+            Wird geladen ...
+        </h3>
+
+        <div class="event-details">
+
+            <span id="dashboardDatum">
+                📅 ...
+            </span>
+
+            <span id="dashboardUhrzeit">
+                🕙 ...
+            </span>
+
+            <span>
+                📍 Hangelar
+            </span>
+
+        </div>
+
+        <span class="status status-veroeffentlicht">
+            Veröffentlicht
+        </span>
+
+    </div>
 
 </div>
 
-<script src="admin.js"></script>
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             STATISTIK
+        ================================================== -->
+
+        <section class="dashboard-stats">
+
+            <div class="dashboard-stat card">
+
+                <div class="dashboard-stat-icon">
+                    👥
+                </div>
+
+                <div>
+
+                    <span class="dashboard-stat-label">
+                        Verkäufer
+                    </span>
+
+                  <strong id="dashboardVerkaeufer">
+    0
+</strong>
+
+                </div>
+
+            </div>
+
+
+            <div class="dashboard-stat card">
+
+                <div class="dashboard-stat-icon">
+                    📍
+                </div>
+
+                <div>
+
+                    <span class="dashboard-stat-label">
+                        Stände
+                    </span>
+
+                  <strong id="dashboardStaende">
+    0
+</strong>
+
+                </div>
+
+            </div>
+
+
+            <div class="dashboard-stat card">
+
+                <div class="dashboard-stat-icon">
+                    🟢
+                </div>
+
+                <div>
+
+                    <span class="dashboard-stat-label">
+                        Status
+                    </span>
+
+                    <strong>
+                        Aktiv
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+       
+
+
+        <!-- =================================================
+             BESUCHERKARTE
+        ================================================== -->
+
+        <section class="dashboard-section">
+
+            <div class="visitor-card">
+
+                <div>
+
+                    <span class="visitor-icon">
+                        🗺️
+                    </span>
+
+                    <div>
+
+                        <h2>Besucherkarte</h2>
+
+                        <p>
+                            Öffentliche Karte mit allen aktuellen Ständen
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <a
+                    href="../../index.html"
+                    class="primary-btn">
+
+                    🗺️ Karte öffnen
+
+                </a>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+<script src="../../config.js"></script>
+<script src="../js/admin.js"></script>
+
+
+
+<script>
+/*
+   Schnellzugriff des Dashboards.
+   Die vorhandene Navigation aus admin.js
+   bleibt unverändert.
+*/
+
+document
+    .querySelectorAll(".quick-action")
+    .forEach(button => {
+
+        button.addEventListener("click", () => {
+
+            const page = button.dataset.page;
+
+            const menuButton =
+                document.querySelector(
+                    `.menu[data-page="${page}"]`
+                );
+
+            if (menuButton) {
+                menuButton.click();
+            }
+
+        });
+
+    });
+</script>
 
 </body>
 </html>

@@ -1,238 +1,1005 @@
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family:Arial, Helvetica, sans-serif;
+/* =========================================================
+   DORFFLOHMARKT HANGELAR – ADMIN BEREICH
+   Gemeinsames Design
+========================================================= */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, Helvetica, sans-serif;
 }
 
-body{
-    background:#f4f6f8;
+:root {
+    --green: #2d6a4f;
+    --green-dark: #24563f;
+    --green-light: #e9f5ef;
+    --green-soft: #f3f8f5;
+
+    --text: #263238;
+    --muted: #6b7280;
+
+    --background: #f4f6f8;
+    --white: #ffffff;
+    --border: #e2e6e9;
+
+    --shadow: 0 4px 14px rgba(0, 0, 0, 0.07);
+    --radius: 12px;
 }
 
-.layout{
-    display:flex;
-    min-height:100vh;
+
+/* =========================================================
+   GRUNDLAYOUT
+========================================================= */
+
+body {
+    background: var(--background);
+    color: var(--text);
 }
 
-/* Sidebar */
-
-.sidebar{
-    width:240px;
-    background:#2d6a4f;
-    color:white;
-    display:flex;
-    flex-direction:column;
-    padding:20px;
+.layout {
+    display: flex;
+    min-height: 100vh;
 }
 
-.logo{
-    text-align:center;
-    font-size:22px;
-    font-weight:bold;
-    margin-bottom:40px;
-    line-height:1.5;
+
+/* =========================================================
+   SIDEBAR
+========================================================= */
+
+.sidebar {
+    width: 250px;
+    min-height: 100vh;
+
+    background: var(--green);
+    color: white;
+
+    display: flex;
+    flex-direction: column;
+
+    padding: 24px 18px;
+
+    box-shadow: 3px 0 12px rgba(0, 0, 0, 0.08);
 }
 
-.logo span{
-    font-size:18px;
+.logo {
+    text-align: center;
+
+    font-size: 30px;
+    font-weight: bold;
+
+    line-height: 1.25;
+
+    margin-bottom: 38px;
 }
 
-nav{
-    display:flex;
-    flex-direction:column;
-    gap:10px;
+.logo span {
+    display: block;
+
+    font-size: 19px;
+    line-height: 1.35;
+
+    margin-top: 6px;
 }
 
-.menu{
-    background:none;
-    border:none;
-    color:white;
-    text-align:left;
-    padding:12px 15px;
-    border-radius:8px;
-    cursor:pointer;
-    font-size:16px;
-    transition:0.2s;
+
+/* =========================================================
+   NAVIGATION
+========================================================= */
+
+nav {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
 }
 
-.menu:hover{
-    background:rgba(255,255,255,.15);
+.menu {
+    width: 100%;
+
+    background: transparent;
+    border: none;
+
+    color: white;
+
+    text-align: left;
+
+    padding: 13px 15px;
+
+    border-radius: 9px;
+
+    cursor: pointer;
+
+    font-size: 15px;
+    font-weight: 500;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease,
+        transform 0.15s ease;
 }
 
-.menu.active{
-    background:white;
-    color:#2d6a4f;
-    font-weight:bold;
+.menu:hover {
+    background: rgba(255, 255, 255, 0.14);
+    transform: translateX(2px);
 }
 
-.back{
-    margin-top:auto;
-    text-decoration:none;
-    color:white;
-    padding:12px;
-    border-radius:8px;
-    text-align:center;
-    border:1px solid rgba(255,255,255,.3);
+.menu.active {
+    background: white;
+    color: var(--green);
+    font-weight: bold;
+
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
 }
 
-.back:hover{
-    background:rgba(255,255,255,.15);
+
+/* =========================================================
+   BESUCHERKARTE LINK
+========================================================= */
+
+.back {
+    margin-top: auto;
+
+    display: block;
+
+    text-decoration: none;
+    color: white;
+
+    padding: 12px 14px;
+
+    border-radius: 9px;
+
+    text-align: center;
+
+    border: 1px solid rgba(255, 255, 255, 0.3);
+
+    transition: 0.2s;
 }
 
-/* Inhalt */
-
-main{
-    flex:1;
-    padding:40px;
+.back:hover {
+    background: rgba(255, 255, 255, 0.15);
 }
 
-h1{
-    margin-bottom:20px;
-    color:#2d6a4f;
+
+/* =========================================================
+   HAUPTINHALT
+========================================================= */
+
+main {
+    flex: 1;
+
+    padding: 38px 42px;
+
+    max-width: 1500px;
 }
 
-p{
-    font-size:18px;
-    color:#555;
+h1 {
+    margin-bottom: 8px;
+
+    color: var(--green);
+
+    font-size: 30px;
 }
 
-/* Smartphone */
-
-@media(max-width:800px){
-
-.layout{
-    flex-direction:column;
+h2 {
+    color: var(--green);
 }
 
-.sidebar{
-    width:100%;
+p {
+    font-size: 16px;
+    color: var(--muted);
 }
 
-}
-/* ==========================
-   Verkäuferverwaltung
-========================== */
 
-.seller-layout{
-    display:grid;
-    grid-template-columns:350px 1fr;
-    gap:25px;
-    margin-top:25px;
+/* =========================================================
+   ALLGEMEINE KARTEN
+========================================================= */
+
+.card {
+    background: var(--white);
+
+    border-radius: var(--radius);
+
+    padding: 22px;
+
+    box-shadow: var(--shadow);
+
+    border: 1px solid rgba(0, 0, 0, 0.03);
+}
+
+
+/* =========================================================
+   BUTTONS
+========================================================= */
+
+button {
+    font-family: inherit;
+}
+
+.primary-btn {
+    background: var(--green);
+    color: white;
+
+    border: none;
+
+    padding: 10px 16px;
+
+    border-radius: 8px;
+
+    cursor: pointer;
+
+    font-size: 14px;
+    font-weight: bold;
+
+    transition: 0.2s;
+}
+
+.primary-btn:hover {
+    background: var(--green-dark);
+}
+
+.secondary-btn {
+    background: white;
+    color: var(--green);
+
+    border: 1px solid var(--green);
+
+    padding: 10px 16px;
+
+    border-radius: 8px;
+
+    cursor: pointer;
+
+    font-size: 14px;
+    font-weight: bold;
+
+    transition: 0.2s;
+}
+
+.secondary-btn:hover {
+    background: var(--green-light);
+}
+
+
+/* =========================================================
+   STATUS-BADGES
+========================================================= */
+
+.status {
+    display: inline-block;
+
+    padding: 5px 10px;
+
+    border-radius: 20px;
+
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.status-vorbereitung {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.status-veroeffentlicht {
+    background: #d8f3dc;
+    color: #1b5e20;
+}
+
+.status-abgeschlossen {
+    background: #f8d7da;
+    color: #842029;
+}
+
+.status-archiviert {
+    background: #e9ecef;
+    color: #495057;
+}
+
+
+/* =========================================================
+   VERKÄUFER
+========================================================= */
+
+.seller-layout {
+    display: grid;
+
+    grid-template-columns: 350px 1fr;
+
+    gap: 25px;
+
+    margin-top: 25px;
 }
 
 .seller-list,
-.seller-details{
-    background:#fff;
-    border-radius:10px;
-    padding:20px;
-    box-shadow:0 2px 8px rgba(0,0,0,.08);
+.seller-details {
+    background: var(--white);
+
+    border-radius: var(--radius);
+
+    padding: 22px;
+
+    box-shadow: var(--shadow);
 }
 
-#search{
-    width:100%;
-    padding:12px;
-    font-size:15px;
-    border:1px solid #ccc;
-    border-radius:8px;
-    margin-bottom:20px;
+
+/* Suche */
+
+#search {
+    width: 100%;
+
+    padding: 12px 14px;
+
+    font-size: 15px;
+
+    border: 1px solid #d5dadd;
+
+    border-radius: 8px;
+
+    margin-bottom: 18px;
+
+    outline: none;
+
+    transition: 0.2s;
 }
 
-.seller-item{
-    padding:12px;
-    border-bottom:1px solid #eee;
-    cursor:pointer;
-    transition:.2s;
+#search:focus {
+    border-color: var(--green);
+
+    box-shadow: 0 0 0 3px rgba(45, 106, 79, 0.12);
 }
 
-.seller-item:hover{
-    background:#f4f6f8;
+
+/* Verkäuferliste */
+
+.seller-item {
+    padding: 13px 12px;
+
+    border-bottom: 1px solid #edf0f2;
+
+    cursor: pointer;
+
+    transition: 0.2s;
+
+    border-radius: 7px;
 }
 
-.seller-item.active{
-    background:#e9f5ef;
-    border-left:4px solid #2d6a4f;
+.seller-item:hover {
+    background: var(--green-soft);
 }
 
-.seller-item strong{
-    display:block;
-    color:#2d6a4f;
+.seller-item.active {
+    background: var(--green-light);
+
+    border-left: 4px solid var(--green);
+
+    padding-left: 8px;
 }
 
-.seller-details table{
-    width:100%;
-    border-collapse:collapse;
-    margin-top:20px;
+.seller-item strong {
+    display: block;
+
+    color: var(--green);
+
+    margin-bottom: 3px;
 }
 
-.seller-details td{
-    padding:10px 0;
-    border-bottom:1px solid #eee;
-    vertical-align:top;
+
+/* Verkäuferdetails */
+
+.seller-details table {
+    width: 100%;
+
+    border-collapse: collapse;
+
+    margin-top: 20px;
 }
 
-.seller-details td:first-child{
-    width:170px;
-    font-weight:bold;
-    color:#2d6a4f;
+.seller-details td {
+    padding: 11px 0;
+
+    border-bottom: 1px solid #edf0f2;
+
+    vertical-align: top;
 }
 
-@media(max-width:900px){
+.seller-details td:first-child {
+    width: 170px;
 
-    .seller-layout{
-        grid-template-columns:1fr;
+    font-weight: bold;
+
+    color: var(--green);
+}
+
+
+/* =========================================================
+   GOOGLE MAPS
+========================================================= */
+
+.maps-link {
+    display: block;
+
+    width: 100%;
+
+    margin-top: 18px;
+
+    padding: 11px 16px;
+
+    background: var(--green);
+
+    color: white;
+
+    text-decoration: none;
+
+    border-radius: 8px;
+
+    font-weight: bold;
+
+    text-align: center;
+
+    transition: 0.2s;
+}
+
+.maps-link:hover {
+    background: var(--green-dark);
+}
+
+
+/* =========================================================
+   INFO / STATISTIK
+========================================================= */
+
+.info-bar {
+    padding: 12px 15px;
+
+    margin: 12px 0;
+
+    background: var(--green-soft);
+
+    border: 1px solid #d7eadf;
+
+    border-radius: 8px;
+
+    color: var(--green);
+
+    font-weight: bold;
+}
+
+.statistik {
+    display: grid;
+
+    grid-template-columns:
+        repeat(auto-fit, minmax(140px, 1fr));
+
+    gap: 10px;
+
+    margin-bottom: 20px;
+
+    padding: 0;
+
+    background: transparent;
+
+    border: none;
+
+    font-size: 14px;
+}
+
+.stat-card {
+    background: white;
+
+    border-radius: 10px;
+
+    padding: 14px;
+
+    box-shadow: var(--shadow);
+
+    border: 1px solid var(--border);
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+}
+
+.stat-name {
+    color: var(--muted);
+
+    font-weight: 500;
+}
+
+.stat-count {
+    color: var(--green);
+
+    font-size: 20px;
+
+    font-weight: bold;
+}
+
+
+/* =========================================================
+   BEARBEITEN
+========================================================= */
+
+.edit-btn {
+    display: block;
+
+    width: 100%;
+
+    margin-top: 18px;
+
+    padding: 11px 16px;
+
+    background: #1565c0;
+
+    color: white;
+
+    border: none;
+
+    border-radius: 8px;
+
+    cursor: pointer;
+
+    font-size: 14px;
+
+    font-weight: bold;
+
+    text-align: center;
+
+    transition: 0.2s;
+}
+
+.edit-btn:hover {
+    background: #0d47a1;
+}
+
+
+/* =========================================================
+   TABELLEN
+========================================================= */
+
+table {
+    width: 100%;
+
+    border-collapse: collapse;
+}
+
+th {
+    background: var(--green);
+
+    color: white;
+
+    padding: 12px;
+
+    text-align: left;
+
+    font-size: 14px;
+}
+
+td {
+    padding: 11px 12px;
+
+    border-bottom: 1px solid var(--border);
+
+    background: white;
+}
+
+tr:hover td {
+    background: var(--green-soft);
+}
+
+
+/* =========================================================
+   FORMULARE
+========================================================= */
+
+input,
+select,
+textarea {
+    font-family: inherit;
+
+    padding: 10px 12px;
+
+    border: 1px solid #d5dadd;
+
+    border-radius: 7px;
+
+    font-size: 14px;
+
+    outline: none;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    border-color: var(--green);
+
+    box-shadow: 0 0 0 3px rgba(45, 106, 79, 0.12);
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 900px) {
+
+    .layout {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        width: 100%;
+        min-height: auto;
+
+        padding: 15px;
+    }
+
+    .logo {
+        margin-bottom: 20px;
+    }
+
+    nav {
+        flex-direction: row;
+
+        flex-wrap: wrap;
+    }
+
+    .menu {
+        width: auto;
+
+        flex: 1 1 140px;
+    }
+
+    .back {
+        margin-top: 15px;
+    }
+
+    main {
+        padding: 25px 18px;
+    }
+
+    .seller-layout {
+        grid-template-columns: 1fr;
     }
 
 }
-.maps-link{
-    display:block;
-    width:100%;
-    margin-top:15px;
-    padding:10px 16px;
-    background:#2e7d32;
-    color:white;
-    text-decoration:none;
-    border-radius:6px;
-    font-weight:bold;
-    text-align:center;
+
+@media (max-width: 600px) {
+
+    h1 {
+        font-size: 25px;
+    }
+
+    main {
+        padding: 20px 12px;
+    }
+
+    .seller-details td:first-child {
+        width: 120px;
+    }
+
+}
+/* =========================================================
+   DASHBOARD
+========================================================= */
+
+.dashboard-header {
+    margin-bottom: 28px;
 }
 
-.maps-link:hover{
-    background:#1b5e20;
+.dashboard-header h1 {
+    margin-bottom: 6px;
 }
 
-.info-bar{
-    padding:10px;
-    margin:10px 0;
-    background:#f5f5f5;
-    border:1px solid #ddd;
-    border-radius:6px;
-    color:#2e7d32;
-    font-weight:bold;
-}
-.statistik{
-    margin-bottom:15px;
-    padding:10px;
-    background:#fafafa;
-    border:1px solid #ddd;
-    border-radius:6px;
-    font-size:14px;
-    line-height:1.6;
-}
-.edit-btn{
-    display:block;
-    width:100%;
-    margin-top:15px;
-    padding:10px 16px;
-    background:#1565c0;
-    color:white;
-    border:none;
-    border-radius:6px;
-    cursor:pointer;
-    font-size:15px;
-    font-weight:bold;
-    text-align:center;
+.dashboard-event {
+    margin-bottom: 22px;
 }
 
-.edit-btn:hover{
-    background:#0d47a1;
+.dashboard-section-title {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 22px;
+}
+
+.dashboard-section-title > span {
+    width: 44px;
+    height: 44px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: var(--green-light);
+
+    border-radius: 10px;
+
+    font-size: 22px;
+}
+
+.dashboard-section-title h2 {
+    margin-bottom: 3px;
+    font-size: 20px;
+}
+
+.dashboard-section-title p {
+    font-size: 14px;
+}
+
+
+/* Veranstaltung */
+
+.event-placeholder {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+
+    padding: 20px;
+
+    background: var(--green-soft);
+
+    border: 1px solid #d7eadf;
+
+    border-radius: 10px;
+}
+
+.event-icon {
+    width: 58px;
+    height: 58px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: var(--green);
+
+    color: white;
+
+    border-radius: 12px;
+
+    font-size: 28px;
+}
+
+.event-placeholder h3 {
+    color: var(--green);
+    font-size: 20px;
+    margin-bottom: 10px;
+}
+
+.event-details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px;
+
+    margin-bottom: 12px;
+
+    color: var(--muted);
+
+    font-size: 14px;
+}
+
+
+/* Statistik */
+
+.dashboard-stats {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+
+    gap: 18px;
+
+    margin-bottom: 30px;
+}
+
+.dashboard-stat {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.dashboard-stat-icon {
+    width: 48px;
+    height: 48px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: var(--green-light);
+
+    border-radius: 10px;
+
+    font-size: 22px;
+}
+
+.dashboard-stat-label {
+    display: block;
+
+    color: var(--muted);
+
+    font-size: 13px;
+
+    margin-bottom: 3px;
+}
+
+.dashboard-stat strong {
+    display: block;
+
+    color: var(--green);
+
+    font-size: 23px;
+}
+
+
+/* Schnellzugriff */
+
+.dashboard-section {
+    margin-bottom: 30px;
+}
+
+.quick-actions {
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, minmax(0, 1fr));
+
+    gap: 16px;
+}
+
+.quick-action {
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: flex-start;
+
+    text-align: left;
+
+    gap: 6px;
+
+    padding: 20px;
+
+    background: white;
+
+    border: 1px solid var(--border);
+
+    border-radius: var(--radius);
+
+    box-shadow: var(--shadow);
+
+    cursor: pointer;
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        border-color 0.2s ease;
+}
+
+.quick-action > span {
+    font-size: 25px;
+
+    margin-bottom: 6px;
+}
+
+.quick-action strong {
+    color: var(--green);
+
+    font-size: 16px;
+}
+
+.quick-action small {
+    color: var(--muted);
+
+    font-size: 13px;
+}
+
+.quick-action:hover {
+    transform: translateY(-2px);
+
+    border-color: #b8d8c7;
+
+    box-shadow:
+        0 7px 18px rgba(0, 0, 0, 0.10);
+}
+
+
+/* Besucherkarte */
+
+.visitor-card {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 20px;
+
+    padding: 22px;
+
+    background: var(--green);
+
+    color: white;
+
+    border-radius: var(--radius);
+
+    box-shadow: var(--shadow);
+}
+
+.visitor-card > div {
+    display: flex;
+
+    align-items: center;
+
+    gap: 15px;
+}
+
+.visitor-icon {
+    font-size: 30px;
+}
+
+.visitor-card h2 {
+    color: white;
+
+    margin-bottom: 4px;
+}
+
+.visitor-card p {
+    color: rgba(255, 255, 255, 0.85);
+
+    font-size: 14px;
+}
+
+.visitor-card .primary-btn {
+    background: white;
+
+    color: var(--green);
+
+    text-decoration: none;
+
+    white-space: nowrap;
+}
+
+.visitor-card .primary-btn:hover {
+    background: var(--green-light);
+}
+
+
+/* Dashboard mobil */
+
+@media (max-width: 1000px) {
+
+    .quick-actions {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+}
+
+@media (max-width: 700px) {
+
+    .dashboard-stats {
+        grid-template-columns: 1fr;
+    }
+
+    .quick-actions {
+        grid-template-columns: 1fr;
+    }
+
+    .event-placeholder {
+        align-items: flex-start;
+
+        flex-direction: column;
+    }
+
+    .visitor-card {
+        align-items: flex-start;
+
+        flex-direction: column;
+    }
+
+    .visitor-card > div {
+        align-items: flex-start;
+    }
+
 }

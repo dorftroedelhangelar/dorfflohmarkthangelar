@@ -20,28 +20,38 @@ async function ladeVeranstaltungen() {
 
     daten.forEach(v => {
 
-        const zeile = document.createElement("tr");
+      const zeile = document.createElement("tr");
 
-zeile.innerHTML = `
-    <td>${v.id}</td>
-    <td>${v.name}</td>
-   <td>${formatiereDatum(v.datum)}</td>
-    <td>${v.beginn}</td>
-    <td>${v.ende}</td>
-    <td>${v.ort}</td>
-    <td>${v.status}</td>
-   <td>
+let archivButton = "";
 
-    <button onclick="bearbeiteVeranstaltung(${v.id})">
-        ✏️
-    </button>
+if (v.status === "Abgeschlossen") {
+    archivButton =
+        '<button onclick="archiviereVeranstaltung(' + v.id + ')">' +
+        '📦' +
+        '</button>';
+}
 
-    <button onclick="loescheVeranstaltung(${v.id})">
-        🗑️
-    </button>
+zeile.innerHTML =
+    '<td>' + v.id + '</td>' +
+    '<td>' + v.name + '</td>' +
+    '<td>' + formatiereDatum(v.datum) + '</td>' +
+    '<td>' + v.beginn + '</td>' +
+    '<td>' + v.ende + '</td>' +
+    '<td>' + v.ort + '</td>' +
+    '<td>' + v.status + '</td>' +
+    '<td>' +
 
-</td>
-`;
+        '<button onclick="bearbeiteVeranstaltung(' + v.id + ')">' +
+            '✏️' +
+        '</button>' +
+
+        '<button onclick="loescheVeranstaltung(' + v.id + ')">' +
+            '🗑️' +
+        '</button>' +
+
+        archivButton +
+
+    '</td>';
 
 tbody.appendChild(zeile);
 
@@ -142,6 +152,8 @@ async function loescheVeranstaltung(id) {
     }
 
 }
+
+
 
 async function speichereVeranstaltung() {
 const btn = document.getElementById("btnSpeichern");
@@ -245,4 +257,56 @@ function formatiereDatum(datum) {
 
     return teile[2] + "." + teile[1] + "." + teile[0];
 
+}
+
+async function archiviereVeranstaltung(id) {
+
+    const v = veranstaltungen.find(x => x.id == id);
+
+    if (!v) {
+        alert("Veranstaltung nicht gefunden.");
+        return;
+    }
+
+    const bestaetigung = confirm(
+        'Möchten Sie die Veranstaltung "' + v.name +
+        '" wirklich archivieren?\n\n' +
+        'Die Anmeldungen dieser Veranstaltung werden dauerhaft ' +
+        'archiviert und anschließend aus der aktuellen Anmeldeliste entfernt.'
+    );
+
+    if (!bestaetigung) {
+        return;
+    }
+
+    try {
+
+        const response = await fetch(
+            API +
+            "?format=archivieren" +
+            "&id=" + encodeURIComponent(id)
+        );
+
+        const text = await response.text();
+
+        if (!response.ok) {
+            throw new Error(text);
+        }
+
+        if (text.startsWith("Exception") || text.startsWith("Error")) {
+            throw new Error(text);
+        }
+
+        alert(text);
+
+        await ladeVeranstaltungen();
+
+    } catch (err) {
+
+        alert(
+            "Fehler beim Archivieren:\n\n" +
+            err.message
+        );
+
+    }
 }
