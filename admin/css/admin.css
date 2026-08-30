@@ -1003,3 +1003,168 @@ textarea:focus {
     }
 
 }
+
+/* =========================================
+   RUNDMAILEN
+========================================= */
+
+.mail-section {
+    margin-bottom: 25px;
+}
+
+.mail-section label {
+    display: block;
+    margin-top: 18px;
+    margin-bottom: 7px;
+    color: #2d6a4f;
+}
+
+.mail-section input[type="text"],
+.mail-section select,
+.mail-section textarea {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    padding: 12px 14px;
+    border: 1px solid #cfd6d2;
+    border-radius: 8px;
+    background: #fff;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 15px;
+    color: #333;
+}
+
+.mail-section input[type="text"],
+.mail-section select {
+    min-height: 44px;
+}
+
+.mail-section textarea {
+    min-height: 260px;
+    resize: vertical;
+    line-height: 1.5;
+}
+
+.mail-section input:focus,
+.mail-section select:focus,
+.mail-section textarea:focus {
+    outline: none;
+    border-color: #2d6a4f;
+    box-shadow: 0 0 0 2px rgba(45,106,79,.12);
+}
+
+.mail-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 12px;
+}
+
+.mail-seller-list {
+    max-height: 350px;
+    overflow-y: auto;
+    border: 1px solid #e1e6e3;
+    border-radius: 8px;
+}
+
+.mail-seller-list .seller-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.mail-seller-list label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    margin: 0;
+    cursor: pointer;
+    color: #333;
+}
+
+.mail-seller-list input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: #2d6a4f;
+}
+
+.mail-send-area {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.primary-btn,
+.secondary-btn {
+    padding: 11px 18px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.primary-btn {
+    background: #2d6a4f;
+    color: white;
+    border: none;
+}
+
+.primary-btn:hover {
+    background: #24583f;
+}
+
+.secondary-btn {
+    background: white;
+    color: #2d6a4f;
+    border: 1px solid #2d6a4f;
+}
+
+.secondary-btn:hover {
+    background: #e9f5ef;
+}
+
+.mail-history-item {
+    padding: 14px;
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.mail-history-item:last-child {
+    border-bottom: none;
+}
+
+.mail-history-item span {
+    color: #666;
+    font-size: 14px;
+}
+
+.mail-dialog {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.45);
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.mail-dialog-content {
+    width: min(500px, 90%);
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.2);
+}
+
+.mail-dialog-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 25px;
+}
+
+.primary-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}

@@ -283,23 +283,30 @@ let mailEmpfaenger = [];
    VERKÄUFER LADEN
 ========================================================= */
 
-function ladeVerkaeufer() {
+async function ladeVerkaeufer() {
 
-    google.script.run
-        .withSuccessHandler(function(daten) {
+    try {
 
-            alleVerkaeufer = daten || [];
+        const response = await fetch(DATA_URL);
 
-            zeigeListe(alleVerkaeufer);
+        if (!response.ok) {
+            throw new Error("Fehler beim Laden der Verkäufer.");
+        }
 
-        })
-        .withFailureHandler(function(fehler) {
+        const daten = await response.json();
 
-            document.getElementById("sellerList").textContent =
-                "Fehler beim Laden: " + fehler.message;
+        alleVerkaeufer = daten || [];
 
-        })
-        .ladeVerkaeuferAdmin();
+        zeigeListe(alleVerkaeufer);
+
+    } catch (fehler) {
+
+        console.error(fehler);
+
+        document.getElementById("sellerList").textContent =
+            "Fehler beim Laden: " + fehler.message;
+
+    }
 
 }
 
@@ -422,6 +429,11 @@ function aktualisiereAuswahlInfo() {
         mitEmail.length > 0
             ? mitEmail.length + " Empfänger mit E-Mail-Adresse"
             : "Keine Empfänger ausgewählt";
+
+     const mailButton =
+    document.getElementById("btnMailSenden");
+
+mailButton.disabled = mitEmail.length === 0;       
 
 }
 
@@ -604,41 +616,59 @@ document
             "📧 Wird gesendet...";
 
 
-        google.script.run
-            .withSuccessHandler(function(ergebnis) {
+       const url =
+    DATA_URL.replace("format=json", "format=rundmail") +
+    "&empfaenger=" +
+    encodeURIComponent(JSON.stringify(mailEmpfaenger)) +
+    "&betreff=" +
+    encodeURIComponent(betreff) +
+    "&nachricht=" +
+    encodeURIComponent(nachricht);
 
-                alert(ergebnis);
+fetch(url)
 
-                document.getElementById(
-                    "mailDialog"
-                ).style.display = "none";
+    .then(response => {
 
-                button.disabled = false;
+        if (!response.ok) {
+            throw new Error("Fehler beim Versand.");
+        }
 
-                button.textContent =
-                    "📧 Jetzt senden";
+        return response.text();
 
-                ladeMailHistory();
+    })
 
-            })
-            .withFailureHandler(function(fehler) {
+    .then(ergebnis => {
 
-                alert(
-                    "Fehler beim Versand: " +
-                    fehler.message
-                );
+        alert(ergebnis);
 
-                button.disabled = false;
+        document.getElementById(
+            "mailDialog"
+        ).style.display = "none";
 
-                button.textContent =
-                    "📧 Jetzt senden";
+        button.disabled = false;
 
-            })
-            .sendeRundmail(
-                mailEmpfaenger,
-                betreff,
-                nachricht
-            );
+        button.textContent =
+            "📧 Jetzt senden";
+
+        ladeMailHistory();
+
+    })
+
+    .catch(fehler => {
+
+        console.error(fehler);
+
+        alert(
+            "Fehler beim Versand: " +
+            fehler.message
+        );
+
+        button.disabled = false;
+
+        button.textContent =
+            "📧 Jetzt senden";
+
+    });
 
 });
 
@@ -649,14 +679,22 @@ document
 
 function ladeMailHistory() {
 
-    google.script.run
-        .withSuccessHandler(function(daten) {
+    fetch(DATA_URL.replace("format=json", "format=mailversand"))
+
+        .then(response => {
+
+            if (!response.ok) {
+                throw new Error("Fehler beim Laden des Versandverlaufs.");
+            }
+
+            return response.json();
+
+        })
+
+        .then(daten => {
 
             const container =
-                document.getElementById(
-                    "mailHistory"
-                );
-
+                document.getElementById("mailHistory");
 
             if (!daten || daten.length === 0) {
 
@@ -665,7 +703,6 @@ function ladeMailHistory() {
 
                 return;
             }
-
 
             container.innerHTML =
                 daten.map(function(mail) {
@@ -695,16 +732,16 @@ function ladeMailHistory() {
                 }).join("");
 
         })
-        .withFailureHandler(function(fehler) {
 
-            document.getElementById(
-                "mailHistory"
-            ).textContent =
+        .catch(fehler => {
+
+            console.error(fehler);
+
+            document.getElementById("mailHistory").textContent =
                 "Fehler beim Laden des Versandverlaufs: " +
                 fehler.message;
 
-        })
-        .getMailversand();
+        });
 
 }
 
