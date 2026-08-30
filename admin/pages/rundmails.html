@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Rundmails – Dorfflohmarkt Hangelar</title>
+
+    <link rel="stylesheet" href="../css/admin.css">
+</head>
+
+<body>
+
+<div class="layout">
+
+    <!-- SIDEBAR -->
+
+    <aside class="sidebar">
+
+        <div class="logo">
+            🏡
+            <span>
+                Dorfflohmarkt<br>
+                Hangelar
+            </span>
+        </div>
+
+        <nav>
+
+            <a class="menu" href="index.html">
+                🏠 Dashboard
+            </a>
+
+            <a class="menu" href="veranstaltungen.html">
+                📅 Veranstaltungen
+            </a>
+
+            <a class="menu" href="verkaeufer.html">
+                👥 Verkäufer
+            </a>
+
+            <a class="menu active" href="rundmails.html">
+                📧 Rundmails
+            </a>
+
+            <a class="menu" href="abstimmungen.html">
+                🗳 Abstimmungen
+            </a>
+
+            <a class="menu" href="einstellungen.html">
+                ⚙ Einstellungen
+            </a>
+
+        </nav>
+
+        <a href="../../index.html" class="back">
+            ⬅ Besucherkarte
+        </a>
+
+    </aside>
+
+
+    <!-- HAUPTBEREICH -->
+
+    <main>
+
+        <h1>📧 Rundmails</h1>
+
+        <p>
+            Rundmails an die Verkäufer des Dorfflohmarkts.
+        </p>
+
+
+        <!-- EMPFÄNGER -->
+
+        <section class="card mail-section">
+
+            <div class="dashboard-section-title">
+
+                <span>👥</span>
+
+                <div>
+
+                    <h2>Empfänger</h2>
+
+                    <p>
+                        Wähle die Verkäufer aus, die die Nachricht erhalten sollen.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="mail-toolbar">
+
+                <button
+                    id="btnAlleAuswaehlen"
+                    class="secondary-btn">
+
+                    ☑️ Alle auswählen
+
+                </button>
+
+                <span id="auswahlInfo">
+                    0 Verkäufer ausgewählt
+                </span>
+
+            </div>
+
+
+            <div id="sellerList" class="mail-seller-list">
+                Wird geladen...
+            </div>
+
+        </section>
+
+
+        <!-- NACHRICHT -->
+
+        <section class="card mail-section">
+
+            <div class="dashboard-section-title">
+
+                <span>✉️</span>
+
+                <div>
+
+                    <h2>Nachricht</h2>
+
+                    <p>
+                        Erstelle die Rundmail.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <label for="mailVorlage">
+                <strong>Vorlage</strong>
+            </label>
+
+            <select id="mailVorlage">
+
+                <option value="">
+                    — Bitte auswählen —
+                </option>
+
+                <option value="information">
+                    📢 Information
+                </option>
+
+                <option value="absage">
+                    ❌ Absage
+                </option>
+
+            </select>
+
+
+            <label for="mailBetreff">
+                <strong>Betreff</strong>
+            </label>
+
+            <input
+                type="text"
+                id="mailBetreff"
+                value="Information zum Dorftroedel Hangelar"
+            >
+
+
+            <label for="mailNachricht">
+                <strong>Nachricht</strong>
+            </label>
+
+            <textarea
+                id="mailNachricht"
+                rows="12">Hallo zusammen,
+
+hier eine Information zum Dorftroedel Hangelar.
+
+Viele Grüße
+Das Team vom Dorftroedel Hangelar</textarea>
+
+
+            <div class="mail-send-area">
+
+                <span id="mailEmpfaengerInfo">
+                    Keine Empfänger ausgewählt
+                </span>
+
+                <button
+                    id="btnMailSenden"
+                    class="primary-btn">
+
+                    📧 Rundmail senden
+
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- VERSANDVERLAUF -->
+
+        <section class="card mail-section">
+
+            <div class="dashboard-section-title">
+
+                <span>📋</span>
+
+                <div>
+
+                    <h2>Versandverlauf</h2>
+
+                    <p>
+                        Bereits versendete Rundmails.
+                    </p>
+
+                </div>
+
+            </div>
+
+            <div id="mailHistory">
+                Wird geladen...
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<!-- BESTÄTIGUNGSDIALOG -->
+
+<div
+    id="mailDialog"
+    class="mail-dialog"
+    style="display:none;">
+
+    <div class="mail-dialog-content">
+
+        <h2>📧 Rundmail senden</h2>
+
+        <p id="mailDialogInfo"></p>
+
+        <div class="mail-dialog-buttons">
+
+            <button
+                id="btnMailAbbrechen"
+                class="secondary-btn">
+
+                Abbrechen
+
+            </button>
+
+            <button
+                id="btnMailBestaetigen"
+                class="primary-btn">
+
+                📧 Jetzt senden
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script src="../../config.js"></script>
+<script>
+
+let alleVerkaeufer = [];
+let mailEmpfaenger = [];
+
+
+/* =========================================================
+   VERKÄUFER LADEN
+========================================================= */
+
+function ladeVerkaeufer() {
+
+    google.script.run
+        .withSuccessHandler(function(daten) {
+
+            alleVerkaeufer = daten || [];
+
+            zeigeListe(alleVerkaeufer);
+
+        })
+        .withFailureHandler(function(fehler) {
+
+            document.getElementById("sellerList").textContent =
+                "Fehler beim Laden: " + fehler.message;
+
+        })
+        .ladeVerkaeuferAdmin();
+
+}
+
+
+/* =========================================================
+   VERKÄUFERLISTE
+========================================================= */
+
+function zeigeListe(liste) {
+
+    const container =
+        document.getElementById("sellerList");
+
+    container.innerHTML = "";
+
+    if (!liste || liste.length === 0) {
+
+        container.textContent =
+            "Keine Verkäufer vorhanden.";
+
+        aktualisiereAuswahlInfo();
+
+        return;
+    }
+
+    liste.forEach(function(person, index) {
+
+        const div =
+            document.createElement("div");
+
+        div.className = "seller-item";
+
+        div.innerHTML =
+            '<label>' +
+            '<input type="checkbox" ' +
+            'class="seller-check" ' +
+            'data-index="' + index + '">' +
+            '<strong>' +
+            person.nachname +
+            '</strong><br>' +
+            person.strasse +
+            ' ' +
+            person.hausnummer +
+            '</label>';
+
+        container.appendChild(div);
+
+    });
+
+    aktualisiereAuswahlInfo();
+
+}
+
+
+/* =========================================================
+   ALLE AUSWÄHLEN
+========================================================= */
+
+document
+    .getElementById("btnAlleAuswaehlen")
+    .addEventListener("click", function() {
+
+        const checkboxen =
+            document.querySelectorAll(".seller-check");
+
+        const alleAusgewaehlt =
+            checkboxen.length > 0 &&
+            Array.from(checkboxen)
+                .every(cb => cb.checked);
+
+        checkboxen.forEach(function(cb) {
+
+            cb.checked = !alleAusgewaehlt;
+
+        });
+
+        aktualisiereAuswahlInfo();
+
+    });
+
+
+/* =========================================================
+   AUSWAHL ZÄHLEN
+========================================================= */
+
+document.addEventListener("change", function(e) {
+
+    if (e.target.classList.contains("seller-check")) {
+
+        aktualisiereAuswahlInfo();
+
+    }
+
+});
+
+
+function aktualisiereAuswahlInfo() {
+
+    const ausgewaehlt =
+        document.querySelectorAll(
+            ".seller-check:checked"
+        );
+
+    const anzahl =
+        ausgewaehlt.length;
+
+    document.getElementById("auswahlInfo").textContent =
+        anzahl + " Verkäufer ausgewählt";
+
+
+    const mitEmail =
+        Array.from(ausgewaehlt)
+            .map(cb => alleVerkaeufer[
+                Number(cb.dataset.index)
+            ])
+            .filter(v => v && v.email);
+
+
+    document.getElementById("mailEmpfaengerInfo").textContent =
+        mitEmail.length > 0
+            ? mitEmail.length + " Empfänger mit E-Mail-Adresse"
+            : "Keine Empfänger ausgewählt";
+
+}
+
+
+/* =========================================================
+   VORLAGEN
+========================================================= */
+
+document
+    .getElementById("mailVorlage")
+    .addEventListener("change", function() {
+
+        const vorlage = this.value;
+
+        const betreff =
+            document.getElementById("mailBetreff");
+
+        const nachricht =
+            document.getElementById("mailNachricht");
+
+
+        if (vorlage === "information") {
+
+            betreff.value =
+                "Information zum Dorftroedel Hangelar";
+
+            nachricht.value =
+                "Hallo zusammen,\n\n" +
+                "hier eine wichtige Information zum " +
+                "Dorftroedel Hangelar:\n\n" +
+                "[Hier Text einfügen]\n\n" +
+                "Viele Grüße\n" +
+                "Das Team vom Dorftroedel Hangelar";
+
+        }
+
+
+        if (vorlage === "absage") {
+
+            betreff.value =
+                "Absage des Dorftroedels Hangelar";
+
+            nachricht.value =
+                "Hallo zusammen,\n\n" +
+                "leider müssen wir euch mitteilen, " +
+                "dass der Dorftroedel Hangelar " +
+                "abgesagt werden muss.\n\n" +
+                "[Hier ggf. Grund oder weitere " +
+                "Informationen einfügen]\n\n" +
+                "Viele Grüße\n" +
+                "Das Team vom Dorftroedel Hangelar";
+
+        }
+
+});
+
+
+/* =========================================================
+   MAIL SENDEN
+========================================================= */
+
+document
+    .getElementById("btnMailSenden")
+    .addEventListener("click", function() {
+
+        const checkboxen =
+            document.querySelectorAll(
+                ".seller-check:checked"
+            );
+
+        if (checkboxen.length === 0) {
+
+            alert(
+                "Bitte zuerst mindestens einen Verkäufer auswählen."
+            );
+
+            return;
+        }
+
+
+        const ausgewaehlt =
+            Array.from(checkboxen)
+                .map(cb =>
+                    alleVerkaeufer[
+                        Number(cb.dataset.index)
+                    ]
+                );
+
+
+        mailEmpfaenger =
+            ausgewaehlt
+                .filter(v => v && v.email)
+                .map(v => v.email);
+
+
+        if (mailEmpfaenger.length === 0) {
+
+            alert(
+                "Die ausgewählten Verkäufer haben " +
+                "keine E-Mail-Adresse."
+            );
+
+            return;
+        }
+
+
+        document.getElementById(
+            "mailDialogInfo"
+        ).innerHTML =
+            "<strong>" +
+            mailEmpfaenger.length +
+            " E-Mail(s) werden versendet.</strong><br><br>" +
+            "Bitte bestätigen Sie den Versand.";
+
+
+        document.getElementById(
+            "mailDialog"
+        ).style.display = "flex";
+
+});
+
+
+/* =========================================================
+   ABBRECHEN
+========================================================= */
+
+document
+    .getElementById("btnMailAbbrechen")
+    .addEventListener("click", function() {
+
+        document.getElementById(
+            "mailDialog"
+        ).style.display = "none";
+
+    });
+
+
+/* =========================================================
+   VERSAND BESTÄTIGEN
+========================================================= */
+
+document
+    .getElementById("btnMailBestaetigen")
+    .addEventListener("click", function() {
+
+        const betreff =
+            document.getElementById(
+                "mailBetreff"
+            ).value.trim();
+
+        const nachricht =
+            document.getElementById(
+                "mailNachricht"
+            ).value.trim();
+
+
+        if (!betreff) {
+
+            alert("Bitte einen Betreff eingeben.");
+
+            return;
+        }
+
+
+        if (!nachricht) {
+
+            alert(
+                "Bitte einen Nachrichtentext eingeben."
+            );
+
+            return;
+        }
+
+
+        const button = this;
+
+        button.disabled = true;
+
+        button.textContent =
+            "📧 Wird gesendet...";
+
+
+        google.script.run
+            .withSuccessHandler(function(ergebnis) {
+
+                alert(ergebnis);
+
+                document.getElementById(
+                    "mailDialog"
+                ).style.display = "none";
+
+                button.disabled = false;
+
+                button.textContent =
+                    "📧 Jetzt senden";
+
+                ladeMailHistory();
+
+            })
+            .withFailureHandler(function(fehler) {
+
+                alert(
+                    "Fehler beim Versand: " +
+                    fehler.message
+                );
+
+                button.disabled = false;
+
+                button.textContent =
+                    "📧 Jetzt senden";
+
+            })
+            .sendeRundmail(
+                mailEmpfaenger,
+                betreff,
+                nachricht
+            );
+
+});
+
+
+/* =========================================================
+   VERSANDVERLAUF
+========================================================= */
+
+function ladeMailHistory() {
+
+    google.script.run
+        .withSuccessHandler(function(daten) {
+
+            const container =
+                document.getElementById(
+                    "mailHistory"
+                );
+
+
+            if (!daten || daten.length === 0) {
+
+                container.textContent =
+                    "Noch keine Rundmails versendet.";
+
+                return;
+            }
+
+
+            container.innerHTML =
+                daten.map(function(mail) {
+
+                    return `
+                        <div class="mail-history-item">
+
+                            <strong>
+                                ${mail.datum}
+                            </strong>
+
+                            <br>
+
+                            ${mail.betreff}
+
+                            <br>
+
+                            <span>
+                                ${mail.anzahl}
+                                Empfänger ·
+                                ${mail.status}
+                            </span>
+
+                        </div>
+                    `;
+
+                }).join("");
+
+        })
+        .withFailureHandler(function(fehler) {
+
+            document.getElementById(
+                "mailHistory"
+            ).textContent =
+                "Fehler beim Laden des Versandverlaufs: " +
+                fehler.message;
+
+        })
+        .getMailversand();
+
+}
+
+
+/* =========================================================
+   START
+========================================================= */
+
+window.addEventListener(
+    "DOMContentLoaded",
+    function() {
+
+        ladeVerkaeufer();
+
+        ladeMailHistory();
+
+    }
+);
+
+</script>
+
+</body>
+</html>
