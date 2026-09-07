@@ -322,7 +322,7 @@ window.addEventListener("DOMContentLoaded", () => {
                     window.location.href = "verkaeufer.html";
                     break;
 
-                case "mail":
+                case "rundmails":
                     window.location.href = "rundmails.html";
                     break;
 

@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Einstellungen – Dorfflohmarkt Hangelar</title>
+
+    <link rel="stylesheet" href="../css/admin.css">
+</head>
+
+<body>
+
+<div class="layout">
+
+    <aside class="sidebar">
+
+        <div class="logo">
+            🏡<br>
+            <span>Dorfflohmarkt<br>Hangelar</span>
+        </div>
+
+        <nav>
+
+            <a class="menu" href="index.html">
+                🏠 Dashboard
+            </a>
+
+            <a class="menu" href="verkaeufer.html">
+                👥 Verkäufer
+            </a>
+
+            <a class="menu" href="rundmails.html">
+                📧 Rundmails
+            </a>
+
+            <a class="menu" href="abstimmungen.html">
+                🗳 Abstimmungen
+            </a>
+
+            <a class="menu active" href="einstellungen.html">
+                ⚙ Einstellungen
+            </a>
+
+        </nav>
+
+        <a href="../index.html" class="back">
+            ⬅ Besucherkarte
+        </a>
+
+    </aside>
+
+
+    <main>
+
+        <h1>Einstellungen</h1>
+
+        <p class="page-intro">
+            Allgemeine Einstellungen für den Dorfflohmarkt Hangelar.
+        </p>
+
+
+        <section class="settings-card">
+
+            <h2>🏡 Aktuelle Veranstaltung</h2>
+
+            <div class="settings-info">
+
+                <div class="setting-row">
+                    <span>Veranstaltung</span>
+                    <strong id="veranstaltung">Wird geladen...</strong>
+                </div>
+
+                <div class="setting-row">
+                    <span>Datum</span>
+                    <strong id="datum">–</strong>
+                </div>
+
+                <div class="setting-row">
+                    <span>Uhrzeit</span>
+                    <strong id="uhrzeit">–</strong>
+                </div>
+
+            </div>
+
+            <p class="settings-hint">
+                Die Veranstaltung wird unter „Veranstaltungen“
+                verwaltet.
+            </p>
+
+        </section>
+
+
+        <section class="settings-card">
+
+            <h2>📧 E-Mail</h2>
+
+            <div class="setting-row">
+                <span>Absender</span>
+                <strong>Dorftroedel Hangelar</strong>
+            </div>
+
+            <div class="setting-row">
+                <span>E-Mail-Adresse</span>
+                <strong>dorftroedelhangelar@gmail.com</strong>
+            </div>
+
+        </section>
+
+
+        <section class="settings-card">
+
+            <h2>🔧 System</h2>
+
+            <div class="system-status">
+
+                <span class="status-dot"></span>
+
+                <span>
+                    Verbindung zum Google-Backend
+                </span>
+
+                <strong id="systemStatus">
+                    Wird geprüft...
+                </strong>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<script src="../../config.js"></script>
+
+<script>
+
+async function ladeEinstellungen() {
+
+    try {
+
+        const response = await fetch(
+            DATA_URL.replace(
+                "format=json",
+                "format=settings"
+            )
+        );
+
+        if (!response.ok) {
+            throw new Error("Verbindung fehlgeschlagen.");
+        }
+
+        const settings = await response.json();
+
+        document.getElementById("veranstaltung").textContent =
+            settings.Veranstaltung || "Keine Veranstaltung veröffentlicht";
+
+        document.getElementById("datum").textContent =
+            settings.Datum || "–";
+
+        document.getElementById("uhrzeit").textContent =
+            settings.Uhrzeit || "–";
+
+        document.getElementById("systemStatus").textContent =
+            "Verbunden";
+
+    } catch (err) {
+
+        console.error(err);
+
+        document.getElementById("veranstaltung").textContent =
+            "Fehler beim Laden";
+
+        document.getElementById("systemStatus").textContent =
+            "Nicht verbunden";
+    }
+
+}
+
+window.addEventListener(
+    "DOMContentLoaded",
+    ladeEinstellungen
+);
+
+</script>
+
+</body>
+</html>

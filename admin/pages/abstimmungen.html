@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Abstimmungen – Dorfflohmarkt Hangelar</title>
+
+    <link rel="stylesheet" href="../css/admin.css">
+</head>
+
+<body>
+
+<div class="layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+
+        <div class="logo">
+            🏡<br>
+            <span>
+                Dorfflohmarkt<br>
+                Hangelar
+            </span>
+        </div>
+
+        <nav>
+
+            <a class="menu" href="index.html">
+                🏠 Dashboard
+            </a>
+
+            <a class="menu" href="verkaeufer.html">
+                👥 Verkäufer
+            </a>
+
+            <a class="menu" href="veranstaltungen.html">
+                📅 Veranstaltungen
+            </a>
+
+            <a class="menu" href="rundmails.html">
+                📧 Rundmails
+            </a>
+
+            <a class="menu" href="abstimmungen.html">
+                🗳 Abstimmungen
+            </a>
+
+            <a class="menu" href="einstellungen.html">
+                ⚙ Einstellungen
+            </a>
+
+        </nav>
+
+        <a href="../index.html" class="back">
+            ⬅ Besucherkarte
+        </a>
+
+    </aside>
+
+
+    <!-- HAUPTBEREICH -->
+    <main>
+
+        <div class="page-header">
+
+            <div>
+                <h1>Abstimmungen</h1>
+
+                <p class="page-intro">
+                    Abstimmungen erstellen, verwalten und Ergebnisse einsehen.
+                </p>
+            </div>
+
+            <button id="btnNeueAbstimmung" class="primary-btn">
+                ➕ Neue Abstimmung
+            </button>
+
+        </div>
+
+
+        <!-- ABSTIMMUNGSLISTE -->
+        <section class="settings-card veranstaltungen-card">
+
+            <h2>🗳 Abstimmungen</h2>
+
+            <div class="table-wrapper">
+
+                <table id="tblAbstimmungen">
+
+                    <thead>
+
+                        <tr>
+                            <th>Frage</th>
+                            <th>Typ</th>
+                            <th>Start</th>
+                            <th>Ende</th>
+                            <th>Status</th>
+                            <th>Aktionen</th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody id="tbodyAbstimmungen">
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+       <!-- NEUE ABSTIMMUNG -->
+<div
+    id="fensterNeueAbstimmung"
+    class="veranstaltungs-dialog"
+    style="display:none;"
+>
+
+    <div class="veranstaltungs-dialog-content">
+
+        <h2>➕ Neue Abstimmung</h2>
+
+
+        <div class="form-group">
+
+            <label for="txtFrage">
+                Frage
+            </label>
+
+            <input
+                type="text"
+                id="txtFrage"
+                placeholder="z. B. Welcher Termin passt euch?"
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label for="txtTyp">
+                Abstimmungstyp
+            </label>
+
+            <select id="txtTyp">
+
+                <option value="TERMIN">
+                    📅 Terminabstimmung
+                </option>
+
+                <option value="JA_NEIN">
+                    👍 Ja / Nein
+                </option>
+
+                <option value="AUSWAHL">
+                    🗳 Sonstige Abstimmung
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label for="txtVeranstaltungsId">
+                Veranstaltung
+            </label>
+
+            <select id="txtVeranstaltungsId">
+
+                <option value="">
+                    – Keine Veranstaltung –
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <div class="form-row">
+
+            <div class="form-group">
+
+                <label for="txtStart">
+                    Start
+                </label>
+
+                <input
+                    type="datetime-local"
+                    id="txtStart"
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="txtEnde">
+                    Ende
+                </label>
+
+                <input
+                    type="datetime-local"
+                    id="txtEnde"
+                >
+
+            </div>
+
+        </div>
+
+        <div
+    id="antwortmoeglichkeiten"
+    class="form-group"
+>
+
+  <label id="labelAntwortmoeglichkeiten">
+    Antwortmöglichkeiten
+</label>
+
+    <div id="antwortListe">
+
+    </div>
+
+    <button
+        type="button"
+        id="btnAntwortHinzufuegen"
+        class="secondary-btn"
+    >
+        ➕ Antwort hinzufügen
+    </button>
+
+</div>
+
+
+        <div class="dialog-buttons">
+
+            <button
+                id="btnAbstimmungAbbrechen"
+                class="secondary-btn"
+            >
+                ❌ Abbrechen
+            </button>
+
+            <button
+                id="btnAbstimmungSpeichern"
+                class="primary-btn"
+            >
+                💾 Speichern
+            </button>
+
+        </div>
+
+    </div>
+
+</div> 
+
+    </main>
+
+</div>
+
+
+<script src="../../config.js"></script>
+
+<script>
+
+document.getElementById("btnNeueAbstimmung").addEventListener("click", function () {
+
+    document.getElementById("fensterNeueAbstimmung").style.display = "flex";
+
+    ladeVeranstaltungenFuerAbstimmung();
+    aktualisiereAntwortmoeglichkeiten();
+
+});
+
+    
+
+document.getElementById("btnAbstimmungAbbrechen").addEventListener("click", function () {
+
+    document.getElementById("fensterNeueAbstimmung").style.display = "none";
+
+});
+
+</script>
+<script>
+
+async function ladeVeranstaltungenFuerAbstimmung() {
+
+    const select = document.getElementById("txtVeranstaltungsId");
+
+    try {
+
+        const url = DATA_URL.replace(
+            "format=json",
+            "format=veranstaltungen"
+        );
+
+        const response = await fetch(url);
+        const veranstaltungen = await response.json();
+
+        select.innerHTML = `
+            <option value="">
+                – Keine Veranstaltung –
+            </option>
+        `;
+
+        veranstaltungen.forEach(v => {
+
+            const option = document.createElement("option");
+
+            option.value = v.id;
+
+            option.textContent =
+                v.name + " – " + v.datum;
+
+            select.appendChild(option);
+
+        });
+
+    } catch (err) {
+
+        console.error(
+            "Fehler beim Laden der Veranstaltungen:",
+            err
+        );
+
+    }
+
+}
+
+async function ladeAbstimmungen() {
+
+    const tbody = document.getElementById("tbodyAbstimmungen");
+
+    try {
+
+        const url = DATA_URL.replace(
+            "format=json",
+            "format=abstimmungen"
+        );
+
+        const response = await fetch(url);
+        const abstimmungen = await response.json();
+
+        tbody.innerHTML = "";
+
+        if (abstimmungen.length === 0) {
+
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="6" class="empty-state">
+                        Noch keine Abstimmungen vorhanden.
+                    </td>
+                </tr>
+            `;
+
+            return;
+        }
+
+        abstimmungen.forEach(a => {
+
+            const zeile = document.createElement("tr");
+
+            zeile.innerHTML = `
+                <td>${a.frage || ""}</td>
+                <td>${a.typ || ""}</td>
+                <td>${a.start || ""}</td>
+                <td>${a.ende || ""}</td>
+                <td>${a.status || ""}</td>
+                <td>
+                    <button
+                        type="button"
+                        class="secondary-btn"
+                    >
+                        Bearbeiten
+                    </button>
+                </td>
+            `;
+
+            tbody.appendChild(zeile);
+
+        });
+
+    } catch (err) {
+
+        console.error(
+            "Fehler beim Laden der Abstimmungen:",
+            err
+        );
+
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="6">
+                    Abstimmungen konnten nicht geladen werden.
+                </td>
+            </tr>
+        `;
+
+    }
+
+}
+
+ladeAbstimmungen();
+let antwortZaehler = 0;
+
+function aktualisiereAntwortmoeglichkeiten() {
+
+    const typ = document.getElementById("txtTyp").value;
+    const liste = document.getElementById("antwortListe");
+    const button = document.getElementById("btnAntwortHinzufuegen");
+    const label = document.getElementById("labelAntwortmoeglichkeiten");
+
+    liste.innerHTML = "";
+
+    if (typ === "JA_NEIN") {
+
+        const antworten = ["Ja", "Nein"];
+
+        antworten.forEach(antwort => {
+
+            const zeile = document.createElement("div");
+
+            zeile.className = "form-row";
+
+            zeile.innerHTML = `
+                <input
+                    type="text"
+                    class="antwort-input"
+                    value="${antwort}"
+                    readonly
+                >
+            `;
+
+            liste.appendChild(zeile);
+
+        });
+
+        button.textContent = "➕ Antwort hinzufügen";
+        button.style.display = "none";
+
+    } else if (typ === "TERMIN") {
+
+    label.textContent = "Mögliche Termine";
+
+    button.textContent = "➕ Termin hinzufügen";
+    button.style.display = "inline-block";
+
+} else {
+
+    label.textContent = "Antwortmöglichkeiten";
+
+    button.textContent = "➕ Antwort hinzufügen";
+    button.style.display = "inline-block";
+
+}
+
+}
+
+document.getElementById("txtTyp").addEventListener(
+    "change",
+    aktualisiereAntwortmoeglichkeiten
+);
+
+
+document.getElementById("btnAntwortHinzufuegen").addEventListener("click", function () {
+
+    const typ = document.getElementById("txtTyp").value;
+    const liste = document.getElementById("antwortListe");
+
+    const zeile = document.createElement("div");
+
+    zeile.className = "form-row";
+
+    if (typ === "TERMIN") {
+
+        zeile.innerHTML = `
+            <input
+                type="date"
+                class="termin-datum"
+            >
+
+            <input
+                type="time"
+                class="termin-uhrzeit"
+            >
+
+            <button
+                type="button"
+                class="secondary-btn antwort-entfernen"
+            >
+                ❌
+            </button>
+        `;
+
+    } else {
+
+        zeile.innerHTML = `
+            <input
+                type="text"
+                class="antwort-input"
+                placeholder="Antwortmöglichkeit"
+            >
+
+            <button
+                type="button"
+                class="secondary-btn antwort-entfernen"
+            >
+                ❌
+            </button>
+        `;
+
+    }
+
+    liste.appendChild(zeile);
+
+    zeile.querySelector(".antwort-entfernen").addEventListener(
+        "click",
+        function () {
+            zeile.remove();
+        }
+    );
+
+});
+
+document.getElementById("btnAbstimmungSpeichern").addEventListener("click", async function () {
+
+     const speichernButton = this;
+
+    speichernButton.disabled = true;
+    speichernButton.textContent = "⏳ Speichern...";
+    
+    const typ = document.getElementById("txtTyp").value;
+
+let optionen = [];
+
+if (typ === "TERMIN") {
+
+    optionen = Array.from(
+        document.querySelectorAll("#antwortListe .form-row")
+    )
+    .map(zeile => {
+
+        const datum =
+            zeile.querySelector(".termin-datum")?.value || "";
+
+        const uhrzeit =
+            zeile.querySelector(".termin-uhrzeit")?.value || "";
+
+        if (!datum || !uhrzeit) {
+            return "";
+        }
+
+        return `${datum} ${uhrzeit}`;
+
+    })
+    .filter(option => option !== "");
+
+} else {
+
+    optionen = Array.from(
+        document.querySelectorAll("#antwortListe .antwort-input")
+    )
+    .map(input => input.value.trim())
+    .filter(option => option !== "");
+
+}
+
+
+const daten = {
+
+    aktion: "speichereAbstimmung",
+
+    veranstaltungsId:
+        document.getElementById("txtVeranstaltungsId").value,
+
+    frage:
+        document.getElementById("txtFrage").value.trim(),
+
+    typ: typ,
+
+    start:
+        document.getElementById("txtStart").value,
+
+    ende:
+        document.getElementById("txtEnde").value,
+
+    optionen: optionen
+
+};
+
+
+
+    try {
+
+        const response = await fetch(
+            DATA_URL.replace("format=json", ""),
+            {
+                method: "POST",
+                body: JSON.stringify(daten)
+            }
+        );
+
+
+        const ergebnis = await response.json();
+
+
+        if (!ergebnis.erfolg) {
+
+            alert(
+                "Fehler beim Speichern:\n" +
+                (ergebnis.fehler || "Unbekannter Fehler.")
+            );
+
+            return;
+
+        }
+
+
+        alert(
+            "Abstimmung wurde als Entwurf gespeichert."
+        );
+
+
+        document.getElementById(
+            "fensterNeueAbstimmung"
+        ).style.display = "none";
+
+
+    } catch (err) {
+
+    console.error(err);
+
+    alert(
+        "Fehler beim Speichern der Abstimmung."
+    );
+
+} finally {
+
+    speichernButton.disabled = false;
+    speichernButton.textContent = "💾 Speichern";
+
+}
+
+});
+
+</script>
+</body>
+
+</html>
