@@ -415,12 +415,7 @@ async function ladeAbstimmungen() {
                 <td>${a.ende || ""}</td>
                 <td>${a.status || ""}</td>
                 <td>
-                    <button
-                        type="button"
-                        class="secondary-btn"
-                    >
-                        Bearbeiten
-                    </button>
+
                 </td>
             `;
 
@@ -446,6 +441,49 @@ async function ladeAbstimmungen() {
     }
 
 }
+
+document.addEventListener("click", async function (e) {
+
+    if (!e.target.classList.contains("btn-abstimmung-bearbeiten")) {
+        return;
+    }
+
+    const abstimmungsId = e.target.dataset.id;
+
+    console.log(
+        "Bearbeiten geklickt, Abstimmungs-ID:",
+        abstimmungsId
+    );
+
+    const abstimmungenResponse = await fetch(
+    DATA_URL.replace(
+        "format=json",
+        "format=abstimmungen"
+    )
+);
+
+const abstimmungen = await abstimmungenResponse.json();
+
+const abstimmung = abstimmungen.find(
+    a => String(a.id) === String(abstimmungsId)
+);
+
+if (!abstimmung) {
+    alert("Abstimmung wurde nicht gefunden.");
+    return;
+}
+
+document.getElementById("txtFrage").value =
+    abstimmung.frage || "";
+
+   document.getElementById("txtTyp").value =
+    abstimmung.typ || ""; 
+   
+    document.getElementById(
+        "fensterNeueAbstimmung"
+    ).style.display = "flex";
+
+});
 
 ladeAbstimmungen();
 let antwortZaehler = 0;
