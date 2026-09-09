@@ -89,18 +89,19 @@
 
                 <table id="tblAbstimmungen">
 
-                    <thead>
+                  <thead>
 
-                        <tr>
-                            <th>Frage</th>
-                            <th>Typ</th>
-                            <th>Start</th>
-                            <th>Ende</th>
-                            <th>Status</th>
-                            <th>Aktionen</th>
-                        </tr>
+    <tr>
+        <th>Frage</th>
+        <th>Typ</th>
+        <th>Antwortmöglichkeiten</th>
+        <th>Start</th>
+        <th>Ende</th>
+        <th>Status</th>
+        <th>Aktionen</th>
+    </tr>
 
-                    </thead>
+</thead>
 
                     <tbody id="tbodyAbstimmungen">
                     </tbody>
@@ -336,13 +337,26 @@ async function ladeAbstimmungen() {
 
     try {
 
-        const url = DATA_URL.replace(
+        const abstimmungenUrl = DATA_URL.replace(
             "format=json",
             "format=abstimmungen"
         );
 
-        const response = await fetch(url);
-        const abstimmungen = await response.json();
+        const optionenUrl = DATA_URL.replace(
+            "format=json",
+            "format=abstimmungsoptionen"
+        );
+
+        const [
+            abstimmungenResponse,
+            optionenResponse
+        ] = await Promise.all([
+            fetch(abstimmungenUrl),
+            fetch(optionenUrl)
+        ]);
+
+        const abstimmungen = await abstimmungenResponse.json();
+        const optionen = await optionenResponse.json();
 
         tbody.innerHTML = "";
 
@@ -361,11 +375,42 @@ async function ladeAbstimmungen() {
 
         abstimmungen.forEach(a => {
 
+            const zugehoerigeOptionen = optionen
+                .filter(o =>
+                    String(o.abstimmungsId) === String(a.id)
+                )
+                .sort((x, y) =>
+                    Number(x.reihenfolge) - Number(y.reihenfolge)
+                );
+
+            const optionenText = zugehoerigeOptionen
+    .map(o => {
+
+        if (a.typ === "TERMIN") {
+
+            const datum = new Date(o.antwort);
+
+            return datum.toLocaleString("de-DE", {
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric",
+                hour: "2-digit",
+                minute: "2-digit"
+            });
+
+        }
+
+        return o.antwort;
+
+    })
+    .join(", ");
+
             const zeile = document.createElement("tr");
 
             zeile.innerHTML = `
                 <td>${a.frage || ""}</td>
                 <td>${a.typ || ""}</td>
+                <td>${optionenText}</td>
                 <td>${a.start || ""}</td>
                 <td>${a.ende || ""}</td>
                 <td>${a.status || ""}</td>
@@ -392,7 +437,7 @@ async function ladeAbstimmungen() {
 
         tbody.innerHTML = `
             <tr>
-                <td colspan="6">
+                <td colspan="7">
                     Abstimmungen konnten nicht geladen werden.
                 </td>
             </tr>
