@@ -276,7 +276,45 @@ document.getElementById("btnNeueAbstimmung").addEventListener("click", function 
 
 });
 
-    
+ document.addEventListener("click", async function (e) {
+
+    if (!e.target.classList.contains("btn-abstimmung-aktivieren")) {
+        return;
+    }
+
+    const abstimmungsId = e.target.dataset.id;
+
+    try {
+
+        const response = await fetch(
+    DATA_URL.replace("format=json", ""),
+    {
+            method: "POST",
+            headers: {
+                "Content-Type": "text/plain;charset=utf-8"
+            },
+            body: JSON.stringify({
+                aktion: "aktiviereAbstimmung",
+                abstimmungsId: abstimmungsId
+            })
+        });
+
+        const ergebnis = await response.json();
+
+        if (!ergebnis.erfolg) {
+            throw new Error(ergebnis.fehler || "Aktivierung fehlgeschlagen.");
+        }
+
+        await ladeAbstimmungen();
+
+    } catch (err) {
+
+        console.error("Fehler beim Aktivieren:", err);
+                alert("Fehler beim Aktivieren: " + err.message);
+
+    }
+
+});   
 
 document.getElementById("btnAbstimmungAbbrechen").addEventListener("click", function () {
 
@@ -407,42 +445,42 @@ async function ladeAbstimmungen() {
 
             const zeile = document.createElement("tr");
 
-            zeile.innerHTML = `
-                <td>${a.frage || ""}</td>
-                <td>${a.typ || ""}</td>
-                <td>${optionenText}</td>
-                <td>${a.start || ""}</td>
-                <td>${a.ende || ""}</td>
-                <td>${a.status || ""}</td>
-                <td>
-
-                </td>
-            `;
-
-            tbody.appendChild(zeile);
-
-        });
-
-    } catch (err) {
-
-        console.error(
-            "Fehler beim Laden der Abstimmungen:",
-            err
-        );
-
-        tbody.innerHTML = `
-            <tr>
-                <td colspan="7">
-                    Abstimmungen konnten nicht geladen werden.
-                </td>
-            </tr>
-        `;
-
+zeile.innerHTML = `
+    <td>${a.frage || ""}</td>
+    <td>${a.typ || ""}</td>
+    <td>${optionenText}</td>
+    <td>${a.start || ""}</td>
+    <td>${a.ende || ""}</td>
+    <td>${a.status || ""}</td>
+   <td>
+    ${a.status === "Entwurf"
+        ? `<button
+              type="button"
+              class="secondary-btn btn-abstimmung-aktivieren"
+              data-id="${a.id}"
+          >
+              Aktivieren
+          </button>`
+        : a.status === "Aktiv"
+            ? `<button
+                  type="button"
+                  class="secondary-btn btn-abstimmung-aktivieren"
+                  data-id="${a.id}"
+              >
+                  Deaktivieren
+              </button>`
+            : ""
     }
+</td>
+`;
 
+tbody.appendChild(zeile);
+
+});
+    } catch (err) {
+        console.error("Fehler beim Laden der Abstimmungen:", err);
+    }
 }
-
-
 
 ladeAbstimmungen();
 let antwortZaehler = 0;
