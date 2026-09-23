@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Abstimmung – Dorfflohmarkt Hangelar</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+
+        .abstimmung-container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .abstimmung-card {
+            background: white;
+            border-radius: 14px;
+            box-shadow: 0 4px 12px rgba(0,0,0,.12);
+            padding: 30px;
+        }
+
+        .abstimmung-card h2 {
+            margin-top: 0;
+            color: var(--green-dark);
+        }
+
+        .abstimmung-info {
+            margin-bottom: 25px;
+            color: #555;
+        }
+
+        .antwort-option {
+            display: block;
+            margin: 12px 0;
+            padding: 14px 16px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background .2s;
+        }
+
+        .antwort-option:hover {
+            background: #f5f5f5;
+        }
+
+        .antwort-option input {
+            margin-right: 10px;
+        }
+
+        .email-bereich {
+            margin-top: 25px;
+        }
+
+        .email-bereich label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        .email-bereich input {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        .abstimmen-button {
+            margin-top: 25px;
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            background: var(--green);
+            color: white;
+            font-size: 17px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .abstimmen-button:hover {
+            background: var(--green-dark);
+        }
+
+        .abstimmen-button:disabled {
+            background: #aaa;
+            cursor: not-allowed;
+        }
+
+        .meldung {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .meldung.erfolg {
+            display: block;
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .meldung.fehler {
+            display: block;
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .keine-abstimmung {
+            text-align: center;
+            padding: 30px;
+            color: #666;
+        }
+
+        .zurueck {
+            margin-top: 25px;
+            text-align: center;
+        }
+
+        .zurueck a {
+            color: var(--green);
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<header class="hero">
+
+    <div class="hero-content">
+
+        <div class="hero-title">
+
+            <h1>
+                🏡 Dorfflohmarkt Hangelar
+            </h1>
+
+        </div>
+
+        <div class="event-info">
+
+            <div class="info-box">
+
+                <span>🗳️</span>
+
+                <p>Abstimmung</p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</header>
+
+
+<main class="abstimmung-container">
+
+    <div class="abstimmung-card">
+
+        <div id="ladeMeldung">
+
+            Abstimmung wird geladen ...
+
+        </div>
+
+
+        <div id="abstimmungInhalt" style="display:none;">
+
+            <h2 id="frage"></h2>
+
+            <div class="abstimmung-info">
+
+                Bitte wähle eine Antwort aus und gib deine E-Mail-Adresse ein.
+
+            </div>
+
+
+            <div id="antworten"></div>
+
+
+            <div class="email-bereich">
+
+                <label for="email">
+                    E-Mail-Adresse
+                </label>
+
+                <input
+                    type="email"
+                    id="email"
+                    placeholder="deine@email.de"
+                    required
+                >
+
+            </div>
+
+
+            <button
+                id="btnAbstimmen"
+                class="abstimmen-button"
+                onclick="stimmeAbgeben()"
+            >
+                Stimme abgeben
+            </button>
+
+
+            <div
+                id="meldung"
+                class="meldung"
+            ></div>
+
+        </div>
+
+
+        <div class="zurueck">
+
+            <a href="index.html">
+                ← Zurück zur Besucherkarte
+            </a>
+
+        </div>
+
+    </div>
+
+</main>
+
+
+<footer>
+
+    © Dorfflohmarkt Hangelar
+
+</footer>
+
+
+<script>
+
+const API_URL =
+    "https://script.google.com/macros/s/AKfycbz7DnIl89GMZDBWx9xZsYjzCi9J3pb9FpiBY-jxzEgHVJJOfAVkjUEnHCHAsGZhIw-DOw/exec";
+
+
+let aktiveAbstimmung = null;
+let optionen = [];
+
+
+async function ladeAbstimmung() {
+
+    try {
+
+        const antwortAbstimmungen =
+            await fetch(
+                API_URL + "?format=abstimmungen"
+            );
+
+        const abstimmungen =
+            await antwortAbstimmungen.json();
+
+
+        // Nur aktive Abstimmungen berücksichtigen
+        const aktive =
+            abstimmungen.filter(
+                a => String(a.status).trim() === "Aktiv"
+            );
+
+
+        if (aktive.length === 0) {
+
+            document.getElementById("ladeMeldung").innerHTML = `
+                <div class="keine-abstimmung">
+                    <h2>🗳️ Keine aktive Abstimmung</h2>
+                    <p>
+                        Zurzeit ist keine Abstimmung aktiv.
+                    </p>
+                </div>
+            `;
+
+            return;
+        }
+
+
+        // Die erste aktive Abstimmung verwenden
+        aktiveAbstimmung = aktive[0];
+
+
+        const antwortOptionen =
+            await fetch(
+                API_URL + "?format=abstimmungsoptionen"
+            );
+
+        const alleOptionen =
+            await antwortOptionen.json();
+
+
+        optionen =
+            alleOptionen
+                .filter(
+                    option =>
+                        String(option.abstimmungsId) ===
+                        String(aktiveAbstimmung.id)
+                )
+                .sort(
+                    (a, b) =>
+                        Number(a.reihenfolge || 0) -
+                        Number(b.reihenfolge || 0)
+                );
+
+
+        document.getElementById("frage").textContent =
+            aktiveAbstimmung.frage;
+
+
+        const container =
+            document.getElementById("antworten");
+
+        container.innerHTML = "";
+
+
+        optionen.forEach(option => {
+
+            const label =
+                document.createElement("label");
+
+            label.className =
+                "antwort-option";
+
+
+            label.innerHTML = `
+                <input
+                    type="radio"
+                    name="abstimmungsantwort"
+                    value="${option.optionsId}"
+                >
+                ${option.antwort}
+            `;
+
+
+            container.appendChild(label);
+
+        });
+
+
+        document.getElementById("ladeMeldung")
+            .style.display = "none";
+
+        document.getElementById("abstimmungInhalt")
+            .style.display = "block";
+
+
+    } catch (fehler) {
+
+        console.error(
+            "Fehler beim Laden der Abstimmung:",
+            fehler
+        );
+
+        document.getElementById("ladeMeldung").innerHTML = `
+            <div class="keine-abstimmung">
+                <h2>Fehler beim Laden</h2>
+                <p>
+                    Die Abstimmung konnte momentan nicht geladen werden.
+                </p>
+            </div>
+        `;
+
+    }
+
+}
+
+
+async function stimmeAbgeben() {
+
+    const email =
+        document.getElementById("email")
+            .value
+            .trim()
+            .toLowerCase();
+
+
+    const ausgewaehlt =
+        document.querySelector(
+            'input[name="abstimmungsantwort"]:checked'
+        );
+
+
+    const meldung =
+        document.getElementById("meldung");
+
+    const button =
+        document.getElementById("btnAbstimmen");
+
+
+    meldung.className = "meldung";
+
+    meldung.textContent = "";
+
+
+    if (!ausgewaehlt) {
+
+        meldung.className =
+            "meldung fehler";
+
+        meldung.textContent =
+            "Bitte wähle eine Antwort aus.";
+
+        return;
+
+    }
+
+
+    if (!email) {
+
+        meldung.className =
+            "meldung fehler";
+
+        meldung.textContent =
+            "Bitte gib deine E-Mail-Adresse ein.";
+
+        return;
+
+    }
+
+
+    button.disabled = true;
+
+    button.textContent =
+        "Stimme wird gespeichert ...";
+
+
+    try {
+
+        const url =
+            API_URL +
+            "?format=abstimmen" +
+            "&abstimmungsId=" +
+            encodeURIComponent(
+                aktiveAbstimmung.id
+            ) +
+            "&optionsId=" +
+            encodeURIComponent(
+                ausgewaehlt.value
+            ) +
+            "&email=" +
+            encodeURIComponent(email);
+
+
+        const antwort =
+            await fetch(url);
+
+
+        const ergebnis =
+            await antwort.json();
+
+
+        if (ergebnis.erfolg) {
+
+            meldung.className =
+                "meldung erfolg";
+
+            meldung.textContent =
+                ergebnis.meldung;
+
+
+            // Nach erfolgreicher Abstimmung Eingaben sperren
+            document
+                .querySelectorAll(
+                    'input[name="abstimmungsantwort"], #email'
+                )
+                .forEach(element => {
+                    element.disabled = true;
+                });
+
+
+            button.disabled = true;
+
+            button.textContent =
+                "Stimme abgegeben";
+
+
+        } else {
+
+            meldung.className =
+                "meldung fehler";
+
+            meldung.textContent =
+                ergebnis.fehler ||
+                "Die Stimme konnte nicht gespeichert werden.";
+
+            button.disabled = false;
+
+            button.textContent =
+                "Stimme abgeben";
+
+        }
+
+
+    } catch (fehler) {
+
+        console.error(
+            "Fehler beim Absenden:",
+            fehler
+        );
+
+
+        meldung.className =
+            "meldung fehler";
+
+        meldung.textContent =
+            "Die Stimme konnte momentan nicht gespeichert werden.";
+
+
+        button.disabled = false;
+
+        button.textContent =
+            "Stimme abgeben";
+
+    }
+
+}
+
+
+ladeAbstimmung();
+
+</script>
+
+
+</body>
+
+</html>

@@ -270,6 +270,8 @@
 document.getElementById("btnNeueAbstimmung").addEventListener("click", function () {
 
     document.getElementById("fensterNeueAbstimmung").style.display = "flex";
+document.getElementById("btnAbstimmungSpeichern")
+    .dataset.abstimmungsId = "";
 
     ladeVeranstaltungenFuerAbstimmung();
     aktualisiereAntwortmoeglichkeiten();
@@ -316,6 +318,183 @@ document.getElementById("btnNeueAbstimmung").addEventListener("click", function 
 
 });   
 
+document.addEventListener("click", async function (e) {
+
+    if (!e.target.classList.contains("btn-abstimmung-loeschen")) {
+        return;
+    }
+
+    const abstimmungsId = e.target.dataset.id;
+
+    const bestaetigt = confirm(
+        "Möchtest du diese Abstimmung wirklich löschen?\n\n" +
+        "Die Abstimmung, die Antwortmöglichkeiten und bereits abgegebene Stimmen werden gelöscht."
+    );
+
+    if (!bestaetigt) {
+        return;
+    }
+
+    try {
+
+        const response = await fetch(
+            DATA_URL.replace("format=json", ""),
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "text/plain;charset=utf-8"
+                },
+                body: JSON.stringify({
+                    aktion: "loescheAbstimmung",
+                    abstimmungsId: abstimmungsId
+                })
+            }
+        );
+
+        const ergebnis = await response.json();
+
+        if (!ergebnis.erfolg) {
+            throw new Error(
+                ergebnis.fehler || "Löschen fehlgeschlagen."
+            );
+        }
+
+        alert("Abstimmung wurde gelöscht.");
+
+        await ladeAbstimmungen();
+
+
+    } catch (err) {
+
+        console.error("Fehler beim Löschen:", err);
+
+        alert(
+            "Fehler beim Löschen: " +
+            err.message
+        );
+
+    }
+
+});
+
+document.addEventListener("click", function (e) {
+
+    if (!e.target.classList.contains("btn-abstimmung-bearbeiten")) {
+        return;
+    }
+
+    const abstimmungsId = e.target.dataset.id;
+
+    const abstimmung = window.abstimmungen.find(
+        a => String(a.id) === String(abstimmungsId)
+    );
+
+    if (!abstimmung) {
+        alert("Die Abstimmung wurde nicht gefunden.");
+        return;
+    }
+
+    console.log("Abstimmung zum Bearbeiten:", abstimmung);
+
+    document.getElementById("txtFrage").value =
+        abstimmung.frage || "";
+
+    document.getElementById("txtTyp").value =
+        abstimmung.typ || "";
+
+    document.getElementById("txtVeranstaltungsId").value =
+        abstimmung.veranstaltungsId || "";
+
+    aktualisiereAntwortmoeglichkeiten();
+
+const zugehoerigeOptionen = window.abstimmungsoptionen
+    .filter(o =>
+        String(o.abstimmungsId) === String(abstimmungsId)
+    )
+    .sort((a, b) =>
+        Number(a.reihenfolge) - Number(b.reihenfolge)
+    );
+
+const liste = document.getElementById("antwortListe");
+
+if (abstimmung.typ === "TERMIN") {
+
+    liste.innerHTML = "";
+
+    zugehoerigeOptionen.forEach(option => {
+
+        const datum = new Date(option.antwort);
+
+        if (isNaN(datum.getTime())) {
+            console.error(
+                "Ungültiges Datum bei Abstimmungsoption:",
+                option.antwort
+            );
+            return;
+        }
+
+        const jahr = datum.getFullYear();
+        const monat = String(datum.getMonth() + 1).padStart(2, "0");
+        const tag = String(datum.getDate()).padStart(2, "0");
+
+        const stunde = String(datum.getHours()).padStart(2, "0");
+        const minute = String(datum.getMinutes()).padStart(2, "0");
+
+        const zeile = document.createElement("div");
+
+        zeile.className = "form-row";
+
+        zeile.innerHTML = `
+            <input
+                type="date"
+                class="termin-datum"
+                value="${jahr}-${monat}-${tag}"
+            >
+
+            <input
+                type="time"
+                class="termin-uhrzeit"
+                value="${stunde}:${minute}"
+            >
+        `;
+
+        liste.appendChild(zeile);
+
+    });
+
+
+} else if (abstimmung.typ === "AUSWAHL") {
+
+    liste.innerHTML = "";
+
+    zugehoerigeOptionen.forEach(option => {
+
+        const zeile = document.createElement("div");
+
+        zeile.className = "form-row";
+
+        zeile.innerHTML = `
+            <input
+                type="text"
+                class="antwort-input"
+                value="${option.antwort}"
+            >
+        `;
+
+        liste.appendChild(zeile);
+
+    });
+
+}
+
+document.getElementById("btnAbstimmungSpeichern")
+    .dataset.abstimmungsId = abstimmungsId;
+document.getElementById("fensterNeueAbstimmung").style.display = "flex";
+
+});
+
+
+
 document.getElementById("btnAbstimmungAbbrechen").addEventListener("click", function () {
 
     document.getElementById("fensterNeueAbstimmung").style.display = "none";
@@ -338,6 +517,7 @@ async function ladeVeranstaltungenFuerAbstimmung() {
 
         const response = await fetch(url);
         const veranstaltungen = await response.json();
+      
 
         select.innerHTML = `
             <option value="">
@@ -368,8 +548,8 @@ async function ladeVeranstaltungenFuerAbstimmung() {
     }
 
 }
-
-async function ladeAbstimmungen() {
+async function ladeAbstimmungen()
+ {
 
     const tbody = document.getElementById("tbodyAbstimmungen");
 
@@ -395,6 +575,8 @@ async function ladeAbstimmungen() {
 
         const abstimmungen = await abstimmungenResponse.json();
         const optionen = await optionenResponse.json();
+        window.abstimmungen = abstimmungen;
+window.abstimmungsoptionen = optionen;
 
         tbody.innerHTML = "";
 
@@ -452,7 +634,15 @@ zeile.innerHTML = `
     <td>${a.start || ""}</td>
     <td>${a.ende || ""}</td>
     <td>${a.status || ""}</td>
-   <td>
+  <td>
+    <button
+        type="button"
+        class="secondary-btn btn-abstimmung-bearbeiten"
+        data-id="${a.id}"
+    >
+        Bearbeiten
+    </button>
+
     ${a.status === "Entwurf"
         ? `<button
               type="button"
@@ -471,6 +661,14 @@ zeile.innerHTML = `
               </button>`
             : ""
     }
+
+    <button
+        type="button"
+        class="secondary-btn btn-abstimmung-loeschen"
+        data-id="${a.id}"
+    >
+        Löschen
+    </button>
 </td>
 `;
 
@@ -496,6 +694,8 @@ function aktualisiereAntwortmoeglichkeiten() {
 
     if (typ === "JA_NEIN") {
 
+        
+        label.textContent = "Antwortmöglichkeiten";
         const antworten = ["Ja", "Nein"];
 
         antworten.forEach(antwort => {
@@ -608,6 +808,8 @@ document.getElementById("btnAbstimmungSpeichern").addEventListener("click", asyn
 
      const speichernButton = this;
 
+     const bearbeitungsId = this.dataset.abstimmungsId || null;
+
     speichernButton.disabled = true;
     speichernButton.textContent = "⏳ Speichern...";
     
@@ -650,7 +852,11 @@ if (typ === "TERMIN") {
 
 const daten = {
 
-    aktion: "speichereAbstimmung",
+    aktion: bearbeitungsId
+        ? "updateAbstimmung"
+        : "speichereAbstimmung",
+
+    abstimmungsId: bearbeitungsId,
 
     veranstaltungsId:
         document.getElementById("txtVeranstaltungsId").value,
@@ -699,8 +905,13 @@ const daten = {
 
 
         alert(
-            "Abstimmung wurde als Entwurf gespeichert."
-        );
+    bearbeitungsId
+        ? "Abstimmung wurde erfolgreich geändert."
+        : "Abstimmung wurde als Entwurf gespeichert."
+);
+
+document.getElementById("btnAbstimmungSpeichern")
+    .dataset.abstimmungsId = "";
 
 
         document.getElementById(
