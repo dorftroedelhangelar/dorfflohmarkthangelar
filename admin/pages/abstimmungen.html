@@ -269,12 +269,28 @@
 
 document.getElementById("btnNeueAbstimmung").addEventListener("click", function () {
 
+        bearbeiteteAbstimmungsId = null;
+
     document.getElementById("fensterNeueAbstimmung").style.display = "flex";
 document.getElementById("btnAbstimmungSpeichern")
     .dataset.abstimmungsId = "";
 
     ladeVeranstaltungenFuerAbstimmung();
     aktualisiereAntwortmoeglichkeiten();
+
+});
+
+document.getElementById("btnAbstimmungAbbrechen").addEventListener("click", function () {
+
+    document.getElementById("fensterNeueAbstimmung").style.display = "none";
+
+    bearbeiteteAbstimmungsId = null;
+
+    document.querySelector("#fensterNeueAbstimmung h2").textContent =
+        "➕ Neue Abstimmung";
+
+    document.getElementById("btnAbstimmungSpeichern").textContent =
+        "💾 Speichern";
 
 });
 
@@ -285,7 +301,8 @@ document.getElementById("btnAbstimmungSpeichern")
     }
 
     const abstimmungsId = e.target.dataset.id;
-
+   
+    
     try {
 
         const response = await fetch(
@@ -384,6 +401,14 @@ document.addEventListener("click", function (e) {
     }
 
     const abstimmungsId = e.target.dataset.id;
+     bearbeiteteAbstimmungsId = abstimmungsId;
+
+     document.querySelector("#fensterNeueAbstimmung h2").textContent =
+    "✏️ Abstimmung bearbeiten";
+
+document.getElementById("btnAbstimmungSpeichern").textContent =
+    "💾 Änderungen speichern";
+    document.getElementById("fensterNeueAbstimmung").style.display = "flex";
 
     const abstimmung = window.abstimmungen.find(
         a => String(a.id) === String(abstimmungsId)
@@ -461,9 +486,8 @@ if (abstimmung.typ === "TERMIN") {
         liste.appendChild(zeile);
 
     });
-
-
-} else if (abstimmung.typ === "AUSWAHL") {
+}
+else if (abstimmung.typ === "AUSWAHL") {
 
     liste.innerHTML = "";
 
@@ -487,19 +511,9 @@ if (abstimmung.typ === "TERMIN") {
 
 }
 
-document.getElementById("btnAbstimmungSpeichern")
-    .dataset.abstimmungsId = abstimmungsId;
-document.getElementById("fensterNeueAbstimmung").style.display = "flex";
-
 });
 
 
-
-document.getElementById("btnAbstimmungAbbrechen").addEventListener("click", function () {
-
-    document.getElementById("fensterNeueAbstimmung").style.display = "none";
-
-});
 
 </script>
 <script>
@@ -555,27 +569,23 @@ async function ladeAbstimmungen()
 
     try {
 
-        const abstimmungenUrl = DATA_URL.replace(
-            "format=json",
-            "format=abstimmungen"
-        );
+      
+    const url = DATA_URL.replace(
+    "format=json",
+    "format=abstimmungenAdmin"
+);
 
-        const optionenUrl = DATA_URL.replace(
-            "format=json",
-            "format=abstimmungsoptionen"
-        );
+const response = await fetch(url);
 
-        const [
-            abstimmungenResponse,
-            optionenResponse
-        ] = await Promise.all([
-            fetch(abstimmungenUrl),
-            fetch(optionenUrl)
-        ]);
+const daten = await response.json();
 
-        const abstimmungen = await abstimmungenResponse.json();
-        const optionen = await optionenResponse.json();
-        window.abstimmungen = abstimmungen;
+const abstimmungen =
+    daten.abstimmungen;
+
+const optionen =
+    daten.optionen;
+
+window.abstimmungen = abstimmungen;
 window.abstimmungsoptionen = optionen;
 
         tbody.innerHTML = "";
@@ -603,14 +613,16 @@ window.abstimmungsoptionen = optionen;
                     Number(x.reihenfolge) - Number(y.reihenfolge)
                 );
 
-            const optionenText = zugehoerigeOptionen
+           const angezeigteOptionen = new Set();
+
+const optionenText = zugehoerigeOptionen
     .map(o => {
 
         if (a.typ === "TERMIN") {
 
             const datum = new Date(o.antwort);
 
-            return datum.toLocaleString("de-DE", {
+            const text = datum.toLocaleString("de-DE", {
                 day: "2-digit",
                 month: "2-digit",
                 year: "numeric",
@@ -618,11 +630,19 @@ window.abstimmungsoptionen = optionen;
                 minute: "2-digit"
             });
 
+            if (angezeigteOptionen.has(text)) {
+                return null;
+            }
+
+            angezeigteOptionen.add(text);
+
+            return text;
         }
 
         return o.antwort;
 
     })
+    .filter(text => text !== null)
     .join(", ");
 
             const zeile = document.createElement("tr");
@@ -682,6 +702,7 @@ tbody.appendChild(zeile);
 
 ladeAbstimmungen();
 let antwortZaehler = 0;
+let bearbeiteteAbstimmungsId = null;
 
 function aktualisiereAntwortmoeglichkeiten() {
 
@@ -852,11 +873,11 @@ if (typ === "TERMIN") {
 
 const daten = {
 
-    aktion: bearbeitungsId
+    aktion: bearbeiteteAbstimmungsId
         ? "updateAbstimmung"
         : "speichereAbstimmung",
 
-    abstimmungsId: bearbeitungsId,
+    abstimmungsId: bearbeiteteAbstimmungsId,
 
     veranstaltungsId:
         document.getElementById("txtVeranstaltungsId").value,
@@ -875,7 +896,6 @@ const daten = {
     optionen: optionen
 
 };
-
 
 
     try {
@@ -904,10 +924,10 @@ const daten = {
         }
 
 
-        alert(
-    bearbeitungsId
-        ? "Abstimmung wurde erfolgreich geändert."
-        : "Abstimmung wurde als Entwurf gespeichert."
+       alert(
+    bearbeiteteAbstimmungsId
+    ? "Abstimmung wurde erfolgreich geändert."
+    : "Abstimmung wurde als Entwurf gespeichert."
 );
 
 document.getElementById("btnAbstimmungSpeichern")
@@ -918,6 +938,8 @@ document.getElementById("btnAbstimmungSpeichern")
             "fensterNeueAbstimmung"
         ).style.display = "none";
 
+
+        await ladeAbstimmungen();
 
     } catch (err) {
 

@@ -184,7 +184,9 @@
 
             <div class="abstimmung-info">
 
-                Bitte wähle eine Antwort aus und gib deine E-Mail-Adresse ein.
+              <span id="abstimmungHinweis">
+    Bitte wähle eine Antwort aus und gib deine E-Mail-Adresse ein.
+</span>
 
             </div>
 
@@ -227,10 +229,9 @@
 
         <div class="zurueck">
 
-            <a href="index.html">
-                ← Zurück zur Besucherkarte
-            </a>
-
+           <a href="admin/pages/index.html">
+    ← Zum Dashboard
+</a>
         </div>
 
     </div>
@@ -259,62 +260,127 @@ async function ladeAbstimmung() {
 
     try {
 
-        const antwortAbstimmungen =
-            await fetch(
-                API_URL + "?format=abstimmungen"
-            );
+ const daten = await new Promise((resolve, reject) => {
 
-        const abstimmungen =
-            await antwortAbstimmungen.json();
+    const script =
+        document.createElement("script");
+
+    const callbackName =
+        "abstimmungCallback";
+
+    let timeout;
+
+    window[callbackName] = function (daten) {
+
+        clearTimeout(timeout);
+
+        delete window[callbackName];
+
+        script.remove();
+
+        resolve(daten);
+    };
+
+    script.src =
+        API_URL +
+        "?format=abstimmungOeffentlichJsonp" +
+        "&prefix=" +
+        callbackName;
+
+    script.onerror = function () {
+
+        clearTimeout(timeout);
+
+        delete window[callbackName];
+
+        script.remove();
+
+        reject(
+            new Error(
+                "Die Abstimmungsdaten konnten nicht geladen werden."
+            )
+        );
+    };
+
+    timeout = setTimeout(() => {
+
+        delete window[callbackName];
+
+        script.remove();
+
+        reject(
+            new Error(
+                "Zeitüberschreitung beim Laden der Abstimmung."
+            )
+        );
+
+    }, 15000);
+
+    document.body.appendChild(script);
+
+});
 
 
-        // Nur aktive Abstimmungen berücksichtigen
-        const aktive =
-            abstimmungen.filter(
-                a => String(a.status).trim() === "Aktiv"
-            );
+const abstimmungen =
+    daten.abstimmungen;
+
+const alleOptionen =
+    daten.optionen;
 
 
-        if (aktive.length === 0) {
-
-            document.getElementById("ladeMeldung").innerHTML = `
-                <div class="keine-abstimmung">
-                    <h2>🗳️ Keine aktive Abstimmung</h2>
-                    <p>
-                        Zurzeit ist keine Abstimmung aktiv.
-                    </p>
-                </div>
-            `;
-
-            return;
-        }
+// Nur aktive Abstimmungen berücksichtigen
+const aktive =
+    abstimmungen.filter(
+        a => String(a.status).trim() === "Aktiv"
+    );
 
 
-        // Die erste aktive Abstimmung verwenden
-        aktiveAbstimmung = aktive[0];
+if (aktive.length === 0) {
+
+    document.getElementById("ladeMeldung").innerHTML = `
+        <div class="keine-abstimmung">
+            <h2>🗳️ Keine aktive Abstimmung</h2>
+            <p>
+                Zurzeit ist keine Abstimmung aktiv.
+            </p>
+        </div>
+    `;
+
+    return;
+}
 
 
-        const antwortOptionen =
-            await fetch(
-                API_URL + "?format=abstimmungsoptionen"
-            );
+// Die erste aktive Abstimmung verwenden
+aktiveAbstimmung = aktive[0];
 
-        const alleOptionen =
-            await antwortOptionen.json();
+const hinweis =
+    document.getElementById("abstimmungHinweis");
+
+if (aktiveAbstimmung.typ === "TERMIN") {
+
+    hinweis.textContent =
+        "Bitte wähle einen oder mehrere Termine aus und gib deine E-Mail-Adresse ein.";
+
+} else {
+
+    hinweis.textContent =
+        "Bitte wähle eine Antwort aus und gib deine E-Mail-Adresse ein.";
+
+}
 
 
-        optionen =
-            alleOptionen
-                .filter(
-                    option =>
-                        String(option.abstimmungsId) ===
-                        String(aktiveAbstimmung.id)
-                )
-                .sort(
-                    (a, b) =>
-                        Number(a.reihenfolge || 0) -
-                        Number(b.reihenfolge || 0)
-                );
+optionen =
+    alleOptionen
+        .filter(
+            option =>
+                String(option.abstimmungsId) ===
+                String(aktiveAbstimmung.id)
+        )
+        .sort(
+            (a, b) =>
+                Number(a.reihenfolge || 0) -
+                Number(b.reihenfolge || 0)
+        );
 
 
         document.getElementById("frage").textContent =
@@ -327,29 +393,50 @@ async function ladeAbstimmung() {
         container.innerHTML = "";
 
 
-        optionen.forEach(option => {
-
-            const label =
-                document.createElement("label");
-
-            label.className =
-                "antwort-option";
+        
 
 
-            label.innerHTML = `
-                <input
-                    type="radio"
-                    name="abstimmungsantwort"
-                    value="${option.optionsId}"
-                >
-                ${option.antwort}
-            `;
+const angezeigteTermine = new Set();
 
+optionen.forEach(option => {
 
-            container.appendChild(label);
+    const label =
+        document.createElement("label");
 
+    label.className =
+        "antwort-option";
+
+    let antwortText = option.antwort;
+
+    if (aktiveAbstimmung.typ === "TERMIN") {
+
+        const datum = new Date(option.antwort);
+
+        antwortText = datum.toLocaleDateString("de-DE", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric"
         });
 
+        // Bereits angezeigtes Datum nicht noch einmal anzeigen
+        if (angezeigteTermine.has(antwortText)) {
+            return;
+        }
+        angezeigteTermine.add(antwortText);
+    }
+
+    label.innerHTML = `
+        <input
+            type="${aktiveAbstimmung.typ === "TERMIN" ? "checkbox" : "radio"}"
+            name="abstimmungsantwort"
+            value="${option.optionsId}"
+        >
+        ${antwortText}
+    `;
+
+    container.appendChild(label);
+
+});
 
         document.getElementById("ladeMeldung")
             .style.display = "none";
@@ -387,11 +474,12 @@ async function stimmeAbgeben() {
             .trim()
             .toLowerCase();
 
-
-    const ausgewaehlt =
-        document.querySelector(
+const ausgewaehlt =
+    Array.from(
+        document.querySelectorAll(
             'input[name="abstimmungsantwort"]:checked'
-        );
+        )
+    );
 
 
     const meldung =
@@ -406,7 +494,7 @@ async function stimmeAbgeben() {
     meldung.textContent = "";
 
 
-    if (!ausgewaehlt) {
+    if (ausgewaehlt.length === 0) {
 
         meldung.className =
             "meldung fehler";
@@ -447,10 +535,12 @@ async function stimmeAbgeben() {
             encodeURIComponent(
                 aktiveAbstimmung.id
             ) +
-            "&optionsId=" +
-            encodeURIComponent(
-                ausgewaehlt.value
-            ) +
+          "&optionsIds=" +
+encodeURIComponent(
+    ausgewaehlt
+        .map(element => element.value)
+        .join(",")
+) +
             "&email=" +
             encodeURIComponent(email);
 
