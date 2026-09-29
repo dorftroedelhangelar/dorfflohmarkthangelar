@@ -93,6 +93,7 @@
 
     <tr>
         <th>Frage</th>
+        <th>Veranstaltung</th>
         <th>Typ</th>
         <th>Antwortmöglichkeiten</th>
         <th>Start</th>
@@ -394,7 +395,7 @@ document.addEventListener("click", async function (e) {
 
 });
 
-document.addEventListener("click", function (e) {
+document.addEventListener("click", async function (e) {
 
     if (!e.target.classList.contains("btn-abstimmung-bearbeiten")) {
         return;
@@ -427,10 +428,12 @@ document.getElementById("btnAbstimmungSpeichern").textContent =
     document.getElementById("txtTyp").value =
         abstimmung.typ || "";
 
-    document.getElementById("txtVeranstaltungsId").value =
-        abstimmung.veranstaltungsId || "";
+    await ladeVeranstaltungenFuerAbstimmung();
 
-    aktualisiereAntwortmoeglichkeiten();
+document.getElementById("txtVeranstaltungsId").value =
+    abstimmung.veranstaltungsId || "";
+
+aktualisiereAntwortmoeglichkeiten();
 
 const zugehoerigeOptionen = window.abstimmungsoptionen
     .filter(o =>
@@ -524,13 +527,16 @@ async function ladeVeranstaltungenFuerAbstimmung() {
 
     try {
 
-        const url = DATA_URL.replace(
-            "format=json",
-            "format=veranstaltungen"
-        );
+       const url = DATA_URL.replace(
+    "format=json",
+    "format=abstimmungenAdmin"
+);
 
-        const response = await fetch(url);
-        const veranstaltungen = await response.json();
+const response = await fetch(url);
+const daten = await response.json();
+
+const veranstaltungen = daten.veranstaltungen;
+
       
 
         select.innerHTML = `
@@ -585,6 +591,9 @@ const abstimmungen =
 const optionen =
     daten.optionen;
 
+    const veranstaltungen =
+    daten.veranstaltungen;
+
 window.abstimmungen = abstimmungen;
 window.abstimmungsoptionen = optionen;
 
@@ -594,7 +603,7 @@ window.abstimmungsoptionen = optionen;
 
             tbody.innerHTML = `
                 <tr>
-                    <td colspan="6" class="empty-state">
+                    <td colspan="7" class="empty-state">
                         Noch keine Abstimmungen vorhanden.
                     </td>
                 </tr>
@@ -604,6 +613,14 @@ window.abstimmungsoptionen = optionen;
         }
 
         abstimmungen.forEach(a => {
+
+            const veranstaltung = veranstaltungen.find(
+    v => String(v.id) === String(a.veranstaltungsId)
+);
+
+const veranstaltungsName = veranstaltung
+    ? veranstaltung.name
+    : "";
 
             const zugehoerigeOptionen = optionen
                 .filter(o =>
@@ -622,13 +639,11 @@ const optionenText = zugehoerigeOptionen
 
             const datum = new Date(o.antwort);
 
-            const text = datum.toLocaleString("de-DE", {
-                day: "2-digit",
-                month: "2-digit",
-                year: "numeric",
-                hour: "2-digit",
-                minute: "2-digit"
-            });
+           const text = datum.toLocaleDateString("de-DE", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric"
+});
 
             if (angezeigteOptionen.has(text)) {
                 return null;
@@ -649,6 +664,7 @@ const optionenText = zugehoerigeOptionen
 
 zeile.innerHTML = `
     <td>${a.frage || ""}</td>
+    <td>${veranstaltungsName}</td>
     <td>${a.typ || ""}</td>
     <td>${optionenText}</td>
     <td>${a.start || ""}</td>
@@ -661,6 +677,15 @@ zeile.innerHTML = `
         data-id="${a.id}"
     >
         Bearbeiten
+
+    </button>
+
+        <button
+        type="button"
+        class="secondary-btn btn-abstimmung-ergebnisse"
+        data-id="${a.id}"
+    >
+        Ergebnisse
     </button>
 
     ${a.status === "Entwurf"
@@ -955,6 +980,196 @@ document.getElementById("btnAbstimmungSpeichern")
     speichernButton.textContent = "💾 Speichern";
 
 }
+
+});
+
+document.addEventListener("click", async function (e) {
+
+    if (!e.target.classList.contains("btn-abstimmung-ergebnisse")) {
+        return;
+    }
+
+    const abstimmungsId = e.target.dataset.id;
+
+    try {
+
+        const response = await fetch(
+            DATA_URL.replace("format=json", ""),
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "text/plain;charset=utf-8"
+                },
+                body: JSON.stringify({
+                    aktion: "getAbstimmungsergebnisse",
+                    abstimmungsId: abstimmungsId
+                })
+            }
+        );
+
+        const ergebnis = await response.json();
+
+        if (!ergebnis.erfolg) {
+            throw new Error(
+                ergebnis.fehler ||
+                "Ergebnisse konnten nicht geladen werden."
+            );
+        }
+
+        const abstimmung = window.abstimmungen.find(
+            a => String(a.id) === String(abstimmungsId)
+        );
+
+        if (!abstimmung) {
+            throw new Error(
+                "Abstimmung wurde nicht gefunden."
+            );
+        }
+
+        let zeilen = "";
+
+        ergebnis.optionen.forEach(option => {
+
+            let text = option.antwort;
+
+            if (abstimmung.typ === "TERMIN") {
+
+                const datum = new Date(option.antwort);
+
+                if (!isNaN(datum.getTime())) {
+                    text = datum.toLocaleDateString("de-DE", {
+                        day: "2-digit",
+                        month: "2-digit",
+                        year: "numeric"
+                    });
+                }
+            }
+
+            zeilen += `
+                <div style="
+                    padding:10px 0;
+                    border-bottom:1px solid #eee;
+                    display:flex;
+                    justify-content:space-between;
+                    gap:20px;
+                ">
+                    <span>${text}</span>
+                    <strong>${option.stimmen}</strong>
+                </div>
+            `;
+
+        });
+
+        const fenster = document.createElement("div");
+
+        fenster.id = "ergebnisFenster";
+
+        fenster.style.cssText = `
+            position:fixed;
+            inset:0;
+            background:rgba(0,0,0,.45);
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            z-index:2000;
+            padding:20px;
+        `;
+
+        fenster.innerHTML = `
+            <div style="
+                width:min(550px,100%);
+                max-height:90vh;
+                overflow-y:auto;
+                background:white;
+                border-radius:14px;
+                padding:28px;
+                box-shadow:0 10px 35px rgba(0,0,0,.25);
+            ">
+
+                <h2 style="
+                    margin-top:0;
+                    color:#2d6a4f;
+                ">
+                    📊 Ergebnisse
+                </h2>
+
+                <h3 style="
+                    margin-bottom:20px;
+                ">
+                    ${abstimmung.frage}
+                </h3>
+
+                <div style="
+                    margin-bottom:20px;
+                    padding:14px;
+                    background:#f5faf7;
+                    border-radius:10px;
+                ">
+
+                    <div>
+                        <strong>Teilnehmer:</strong>
+                        ${ergebnis.teilnehmer}
+                    </div>
+
+                    <div>
+                        <strong>Stimmen gesamt:</strong>
+                        ${ergebnis.stimmenGesamt}
+                    </div>
+
+                </div>
+
+                <h3>Antworten</h3>
+
+                ${zeilen}
+
+                <div style="
+                    display:flex;
+                    justify-content:flex-end;
+                    margin-top:25px;
+                ">
+
+                    <button
+                        type="button"
+                        class="secondary-btn"
+                        id="btnErgebnisseSchliessen"
+                    >
+                        Schließen
+                    </button>
+
+                </div>
+
+            </div>
+        `;
+
+        document.body.appendChild(fenster);
+
+        document
+            .getElementById("btnErgebnisseSchliessen")
+            .addEventListener("click", function () {
+                fenster.remove();
+            });
+
+        fenster.addEventListener("click", function (event) {
+
+            if (event.target === fenster) {
+                fenster.remove();
+            }
+
+        });
+
+    } catch (err) {
+
+        console.error(
+            "Fehler beim Laden der Ergebnisse:",
+            err
+        );
+
+        alert(
+            "Fehler beim Laden der Ergebnisse: " +
+            err.message
+        );
+
+    }
 
 });
 
