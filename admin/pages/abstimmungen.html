@@ -465,26 +465,17 @@ if (abstimmung.typ === "TERMIN") {
         const monat = String(datum.getMonth() + 1).padStart(2, "0");
         const tag = String(datum.getDate()).padStart(2, "0");
 
-        const stunde = String(datum.getHours()).padStart(2, "0");
-        const minute = String(datum.getMinutes()).padStart(2, "0");
+      const zeile = document.createElement("div");
 
-        const zeile = document.createElement("div");
+zeile.className = "form-row";
 
-        zeile.className = "form-row";
-
-        zeile.innerHTML = `
-            <input
-                type="date"
-                class="termin-datum"
-                value="${jahr}-${monat}-${tag}"
-            >
-
-            <input
-                type="time"
-                class="termin-uhrzeit"
-                value="${stunde}:${minute}"
-            >
-        `;
+zeile.innerHTML = `
+    <input
+        type="date"
+        class="termin-datum"
+        value="${jahr}-${monat}-${tag}"
+    >
+`;
 
         liste.appendChild(zeile);
 
@@ -657,28 +648,51 @@ const optionenText = zugehoerigeOptionen
         return o.antwort;
 
     })
-    .filter(text => text !== null)
+       .filter(text => text !== null)
     .join(", ");
 
-            const zeile = document.createElement("tr");
+function formatiereAbstimmungsDatum(wert) {
 
+    if (!wert) {
+        return "";
+    }
+
+    const datum = new Date(wert);
+
+    if (isNaN(datum.getTime())) {
+        return wert;
+    }
+
+    return datum.toLocaleString("de-DE", {
+        timeZone: "Europe/Berlin",
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false
+    });
+}
+
+const zeile = document.createElement("tr");
 zeile.innerHTML = `
     <td>${a.frage || ""}</td>
     <td>${veranstaltungsName}</td>
     <td>${a.typ || ""}</td>
     <td>${optionenText}</td>
-    <td>${a.start || ""}</td>
-    <td>${a.ende || ""}</td>
+    <td>${formatiereAbstimmungsDatum(a.start)}</td>
+<td>${formatiereAbstimmungsDatum(a.ende)}</td>  
     <td>${a.status || ""}</td>
   <td>
+   ${a.status !== "Beendet" ? `
     <button
         type="button"
         class="secondary-btn btn-abstimmung-bearbeiten"
         data-id="${a.id}"
     >
         Bearbeiten
-
     </button>
+` : ""}
 
         <button
         type="button"
@@ -688,24 +702,12 @@ zeile.innerHTML = `
         Ergebnisse
     </button>
 
-    ${a.status === "Entwurf"
-        ? `<button
-              type="button"
-              class="secondary-btn btn-abstimmung-aktivieren"
-              data-id="${a.id}"
-          >
-              Aktivieren
-          </button>`
-        : a.status === "Aktiv"
-            ? `<button
-                  type="button"
-                  class="secondary-btn btn-abstimmung-aktivieren"
-                  data-id="${a.id}"
-              >
-                  Deaktivieren
-              </button>`
-            : ""
-    }
+    ${a.status === "Entwurf" ? `
+  <button class="secondary-btn btn-abstimmung-aktivieren"
+          data-id="${a.id}">
+    Aktivieren
+  </button>
+` : ""}
 
     <button
         type="button"
@@ -790,65 +792,69 @@ document.getElementById("txtTyp").addEventListener(
 );
 
 
-document.getElementById("btnAntwortHinzufuegen").addEventListener("click", function () {
+document.getElementById("btnAntwortHinzufuegen").addEventListener(
+    "click",
+    function () {
 
-    const typ = document.getElementById("txtTyp").value;
-    const liste = document.getElementById("antwortListe");
+        const typ =
+            document.getElementById("txtTyp").value;
 
-    const zeile = document.createElement("div");
+        const liste =
+            document.getElementById("antwortListe");
 
-    zeile.className = "form-row";
+        const zeile =
+            document.createElement("div");
 
-    if (typ === "TERMIN") {
+        zeile.className = "form-row";
 
-        zeile.innerHTML = `
-            <input
-                type="date"
-                class="termin-datum"
-            >
+        if (typ === "TERMIN") {
 
-            <input
-                type="time"
-                class="termin-uhrzeit"
-            >
+            zeile.innerHTML = `
+                <input
+                    type="date"
+                    class="termin-datum"
+                >
 
-            <button
-                type="button"
-                class="secondary-btn antwort-entfernen"
-            >
-                ❌
-            </button>
-        `;
+                <button
+                    type="button"
+                    class="secondary-btn antwort-entfernen"
+                >
+                    ❌
+                </button>
+            `;
 
-    } else {
+        } else {
 
-        zeile.innerHTML = `
-            <input
-                type="text"
-                class="antwort-input"
-                placeholder="Antwortmöglichkeit"
-            >
+            zeile.innerHTML = `
+                <input
+                    type="text"
+                    class="antwort-input"
+                    placeholder="Antwortmöglichkeit"
+                >
 
-            <button
-                type="button"
-                class="secondary-btn antwort-entfernen"
-            >
-                ❌
-            </button>
-        `;
+                <button
+                    type="button"
+                    class="secondary-btn antwort-entfernen"
+                >
+                    ❌
+                </button>
+            `;
+
+        }
+
+        liste.appendChild(zeile);
+
+        zeile
+            .querySelector(".antwort-entfernen")
+            .addEventListener(
+                "click",
+                function () {
+                    zeile.remove();
+                }
+            );
 
     }
-
-    liste.appendChild(zeile);
-
-    zeile.querySelector(".antwort-entfernen").addEventListener(
-        "click",
-        function () {
-            zeile.remove();
-        }
-    );
-
-});
+);
 
 document.getElementById("btnAbstimmungSpeichern").addEventListener("click", async function () {
 
@@ -873,14 +879,11 @@ if (typ === "TERMIN") {
         const datum =
             zeile.querySelector(".termin-datum")?.value || "";
 
-        const uhrzeit =
-            zeile.querySelector(".termin-uhrzeit")?.value || "";
-
-        if (!datum || !uhrzeit) {
+        if (!datum) {
             return "";
         }
 
-        return `${datum} ${uhrzeit}`;
+        return datum;
 
     })
     .filter(option => option !== "");

@@ -328,11 +328,29 @@ const alleOptionen =
     daten.optionen;
 
 
-// Nur aktive Abstimmungen berücksichtigen
+// Nur Abstimmungen berücksichtigen,
+// die aktiviert sind und deren Startzeit erreicht ist.
+const jetzt = new Date();
+
 const aktive =
-    abstimmungen.filter(
-        a => String(a.status).trim() === "Aktiv"
-    );
+    abstimmungen.filter(a => {
+
+        if (String(a.status).trim() !== "Aktiv") {
+            return false;
+        }
+
+        if (!a.start) {
+            return true;
+        }
+
+        const start = new Date(a.start);
+
+        if (isNaN(start.getTime())) {
+            return false;
+        }
+
+        return jetzt >= start;
+    });
 
 
 if (aktive.length === 0) {
