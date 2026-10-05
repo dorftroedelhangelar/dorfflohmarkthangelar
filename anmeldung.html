@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Verkäuferanmeldung – Dorfflohmarkt Hangelar</title>
+
+    <style>
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+            color: #222;
+        }
+
+        header {
+            background: #2f8734;
+            color: white;
+            text-align: center;
+            padding: 25px 20px;
+        }
+
+        header .logo {
+            font-size: 42px;
+            margin-bottom: 5px;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 28px;
+        }
+
+        main {
+            max-width: 700px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .karte {
+            background: white;
+            border-radius: 14px;
+            padding: 35px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+            text-align: center;
+        }
+
+        .karte h2 {
+            color: #176b22;
+            margin-top: 0;
+        }
+
+        .veranstaltung {
+            margin: 25px 0;
+            padding: 20px;
+            background: #eef8ef;
+            border: 1px solid #c9e3cc;
+            border-radius: 10px;
+        }
+
+        .veranstaltung strong {
+            display: block;
+            font-size: 21px;
+            margin-bottom: 10px;
+        }
+
+        .anmelden-btn {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 14px 28px;
+            background: #2f8734;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+
+        .anmelden-btn:hover {
+            background: #256d2a;
+        }
+
+        .zurueck {
+            display: inline-block;
+            margin-top: 30px;
+            color: #176b22;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .meldung {
+            color: #555;
+            line-height: 1.5;
+        }
+
+        footer {
+            margin-top: 60px;
+            padding: 18px;
+            background: #2f8734;
+            color: white;
+            text-align: center;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<header>
+
+    <div class="logo">🏡</div>
+
+    <h1>Verkäuferanmeldung</h1>
+
+</header>
+
+
+<main>
+
+    <div class="karte">
+
+        <h2>📅 Anmeldung zum Dorfflohmarkt</h2>
+
+        <div id="inhalt">
+
+            <p class="meldung">
+                Die aktuelle Veranstaltung wird geladen ...
+            </p>
+
+        </div>
+
+        <a
+            href="index.html"
+            class="zurueck"
+        >
+            ← Zur Startseite
+        </a>
+
+    </div>
+
+</main>
+
+
+<footer>
+
+    © Dorfflohmarkt Hangelar
+
+</footer>
+
+
+<script src="config.js"></script>
+
+<script>
+
+async function ladeVeranstaltung() {
+
+    const inhalt =
+        document.getElementById("inhalt");
+
+    try {
+
+        const url =
+            DATA_URL.replace(
+                "format=json",
+                "format=veranstaltungen"
+            );
+
+        const response =
+            await fetch(url);
+
+        const veranstaltungen =
+            await response.json();
+
+        const veranstaltung =
+            veranstaltungen.find(
+                v => v.status === "Veröffentlicht"
+            );
+
+        if (!veranstaltung) {
+
+            inhalt.innerHTML = `
+                <p class="meldung">
+                    📅 Zurzeit ist keine Anmeldung möglich.
+                </p>
+            `;
+
+            return;
+        }
+
+        inhalt.innerHTML = `
+
+        <div class="veranstaltung">
+
+    <strong>
+        ${veranstaltung.name}
+    </strong>
+
+    <div>
+        📅 ${veranstaltung.datum}
+    </div>
+
+    <div>
+        🕐 ${veranstaltung.beginn} – ${veranstaltung.ende} Uhr
+    </div>
+
+    <div>
+        📍 ${veranstaltung.ort}
+    </div>
+
+</div>
+
+            <p>
+                Du möchtest einen Stand beim
+                Dorfflohmarkt anmelden?
+            </p>
+
+          <a
+    href="https://forms.gle/A8mbyZg7FcGbLzoc6"
+    target="_blank"
+    rel="noopener"
+    class="anmelden-btn"
+>
+    📝 Zur Verkäuferanmeldung
+</a>
+
+        `;
+
+    } catch (err) {
+
+        console.error(err);
+
+        inhalt.innerHTML = `
+            <p class="meldung">
+                Die Veranstaltungsdaten konnten
+                nicht geladen werden.
+            </p>
+        `;
+    }
+
+}
+
+
+ladeVeranstaltung();
+
+</script>
+
+</body>
+
+</html>
