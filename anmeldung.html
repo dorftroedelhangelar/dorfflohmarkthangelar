@@ -131,13 +131,12 @@
 
         </div>
 
-        <a
-            href="index.html"
-            class="zurueck"
-        >
-            ← Zur Startseite
-        </a>
-
+       <a
+    href="index.html"
+    class="zurueck"
+>
+    ← Zur Besucherkarte
+</a>
     </div>
 
 </main>
@@ -161,69 +160,157 @@ async function ladeVeranstaltung() {
 
     try {
 
-        const url =
+        const veranstaltungsUrl =
             DATA_URL.replace(
                 "format=json",
                 "format=veranstaltungen"
             );
 
-        const response =
-            await fetch(url);
+        const anmeldungsUrl =
+            DATA_URL.replace(
+                "format=json",
+                "format=json"
+            );
+
+        const [
+            veranstaltungsResponse,
+            anmeldungsResponse
+        ] = await Promise.all([
+            fetch(veranstaltungsUrl),
+            fetch(anmeldungsUrl)
+        ]);
 
         const veranstaltungen =
-            await response.json();
+            await veranstaltungsResponse.json();
+
+        const anmeldungen =
+            await anmeldungsResponse.json();
 
         const veranstaltung =
             veranstaltungen.find(
-                v => v.status === "Veröffentlicht"
+                v =>
+                    v.status === "Veröffentlicht" ||
+                    v.status === "Findet statt" ||
+                    v.status === "Abgeschlossen"
             );
 
         if (!veranstaltung) {
 
             inhalt.innerHTML = `
                 <p class="meldung">
-                    📅 Zurzeit ist keine Anmeldung möglich.
+                    📅 Zurzeit ist keine Verkäuferanmeldung geöffnet.
                 </p>
             `;
 
             return;
         }
 
+        // Anzahl der Anmeldungen für diese Veranstaltung
+        const anzahlVerkaeufer =
+            anmeldungen.filter(
+                person =>
+                    String(person.veranstaltungsId) ===
+                    String(veranstaltung.id)
+            ).length;
+
+
+        // Beginn der Veranstaltung berechnen
+        const datumTeile =
+            String(veranstaltung.datum).split(".");
+
+        const zeitTeile =
+            String(veranstaltung.beginn).split(":");
+
+        const beginn =
+            new Date(
+                Number(datumTeile[2]),
+                Number(datumTeile[1]) - 1,
+                Number(datumTeile[0]),
+                Number(zeitTeile[0]),
+                Number(zeitTeile[1])
+            );
+
+        const veranstaltungHatBegonnen =
+            !isNaN(beginn.getTime()) &&
+            new Date() >= beginn;
+
+
+        // Anmeldung nach Veranstaltungsbeginn geschlossen
+        if (
+            veranstaltungHatBegonnen ||
+            veranstaltung.status === "Abgeschlossen"
+        ) {
+
+            inhalt.innerHTML = `
+                <p class="meldung">
+                    📅 Die Verkäuferanmeldung ist geschlossen.<br>
+                    Die Veranstaltung hat bereits begonnen.
+                </p>
+            `;
+
+            return;
+        }
+
+
+        // Anmeldeinformation
+        let anmeldeInfo = "";
+
+        if (anzahlVerkaeufer >= 50) {
+
+            anmeldeInfo = `
+                <p class="meldung">
+                    ✅ ${anzahlVerkaeufer} Verkäufer angemeldet –
+                    die Mindestanzahl von 50 ist erreicht.
+                </p>
+            `;
+
+        } else {
+
+            anmeldeInfo = `
+                <p class="meldung">
+                    👥 ${anzahlVerkaeufer} von mindestens 50 Verkäufern angemeldet.
+                </p>
+            `;
+        }
+
+
         inhalt.innerHTML = `
 
         <div class="veranstaltung">
 
-    <strong>
-        ${veranstaltung.name}
-    </strong>
+            <strong>
+                ${veranstaltung.name}
+            </strong>
 
-    <div>
-        📅 ${veranstaltung.datum}
-    </div>
+            <div>
+                📅 ${veranstaltung.datum}
+            </div>
 
-    <div>
-        🕐 ${veranstaltung.beginn} – ${veranstaltung.ende} Uhr
-    </div>
+            <div>
+                🕐 ${veranstaltung.beginn} – ${veranstaltung.ende} Uhr
+            </div>
 
-    <div>
-        📍 ${veranstaltung.ort}
-    </div>
+            <div>
+                📍 ${veranstaltung.ort}
+            </div>
 
-</div>
+        </div>
 
-            <p>
-                Du möchtest einen Stand beim
-                Dorfflohmarkt anmelden?
-            </p>
+        ${anmeldeInfo}
 
-          <a
-    href="https://forms.gle/A8mbyZg7FcGbLzoc6"
-    target="_blank"
-    rel="noopener"
-    class="anmelden-btn"
->
-    📝 Zur Verkäuferanmeldung
-</a>
+        <p>
+            Du möchtest einen Stand beim
+            Dorfflohmarkt anmelden?
+        </p>
+
+        <a
+            href="https://forms.gle/A8mbyZg7FcGbLzoc6"
+            target="_blank"
+            rel="noopener"
+            class="anmelden-btn"
+        >
+            📝 Zur Verkäuferanmeldung
+        </a>
 
         `;
 
