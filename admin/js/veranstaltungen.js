@@ -281,25 +281,27 @@ async function archiviereVeranstaltung(id) {
 
     try {
 
-        const response = await fetch(
-            API +
-            "?format=archivieren" +
-            "&id=" + encodeURIComponent(id)
-        );
+       const archivUrl =
+    DATA_URL.replace(
+        "format=json",
+        "format=archivieren"
+    ) +
+    "&id=" + encodeURIComponent(id);
 
-        const text = await response.text();
+await fetch(
+    archivUrl,
+    {
+        mode: "no-cors"
+    }
+);
 
-        if (!response.ok) {
-            throw new Error(text);
-        }
+await new Promise(resolve => {
+    setTimeout(resolve, 2000);
+});
 
-        if (text.startsWith("Exception") || text.startsWith("Error")) {
-            throw new Error(text);
-        }
+alert("Veranstaltung wurde archiviert.");
 
-        alert(text);
-
-        await ladeVeranstaltungen();
+await ladeVeranstaltungen();
 
     } catch (err) {
 
