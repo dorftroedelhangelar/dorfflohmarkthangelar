@@ -153,6 +153,17 @@
 
 <script>
 
+    function formatDatum(datum) {
+
+    const teile = String(datum).split("-");
+
+    if (teile.length === 3) {
+        return `${teile[2]}.${teile[1]}.${teile[0]}`;
+    }
+
+    return datum;
+}
+
 async function ladeVeranstaltung() {
 
     const inhalt =
@@ -282,10 +293,7 @@ async function ladeVeranstaltung() {
                 ${veranstaltung.name}
             </strong>
 
-            <div>
-                📅 ${veranstaltung.datum}
-            </div>
-
+           <div>📅 ${formatDatum(veranstaltung.datum)}</div>
             <div>
                 🕐 ${veranstaltung.beginn} – ${veranstaltung.ende} Uhr
             </div>

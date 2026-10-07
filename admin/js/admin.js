@@ -40,7 +40,7 @@ async function ladeVerkaeufer() {
 
     try {
 
-        const response = await fetch(DATA_URL + "?format=json");
+        const response = await fetch(DATA_URL);
         verkaeufer = await response.json();
       verkaeufer.sort((a, b) =>
     a.nachname.localeCompare(b.nachname, "de")
