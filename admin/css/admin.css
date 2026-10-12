@@ -1431,3 +1431,15 @@ textarea:focus {
     min-width: 45px;
     padding: 10px 0;
 }
+
+
+.kontakt-neu {
+    display: inline-block;
+    margin-left: 8px;
+    padding: 3px 7px;
+    background-color: #fff0cc;
+    color: #8a5200;
+    border-radius: 5px;
+    font-size: 12px;
+    font-weight: bold;
+}

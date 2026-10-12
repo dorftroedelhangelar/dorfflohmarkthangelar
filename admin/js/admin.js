@@ -36,27 +36,45 @@ async function ladeDashboard() {
     }
 
 }
+
 async function ladeVerkaeufer() {
 
     try {
 
-        const response = await fetch(DATA_URL);
-        verkaeufer = await response.json();
-      verkaeufer.sort((a, b) =>
-    a.nachname.localeCompare(b.nachname, "de")
-);
+        const url = DATA_URL.replace(
+            "format=json",
+            "format=verkaeuferKontakte"
+        );
 
-       zeigeVerkaeufer(verkaeufer);
+        const response = await fetch(url);
+        const daten = await response.json();
 
-document.getElementById("search").addEventListener("input", sucheVerkaeufer);
+        if (!response.ok || daten.fehler) {
+            throw new Error(
+                daten.fehler || "Verkäufer konnten nicht geladen werden."
+            );
+        }
 
-    } catch(err) {
+        verkaeufer = daten;
 
-        console.error(err);
+        verkaeufer.sort((a, b) =>
+            a.nachname.localeCompare(b.nachname, "de")
+        );
+
+        zeigeVerkaeufer(verkaeufer);
+
+        document.getElementById("search")
+            .addEventListener("input", sucheVerkaeufer);
+
+    } catch (err) {
+
+        console.error("Fehler beim Laden der Verkäufer:", err);
+        alert("Verkäufer konnten nicht geladen werden: " + err.message);
 
     }
 
 }
+
 
 function zeigeVerkaeufer(liste){
 
@@ -73,10 +91,19 @@ container.innerHTML = "";
 
         div.className = "seller-item";
 
-        div.innerHTML = `
-            <strong>${person.nachname}</strong>
-            ${person.strasse} ${person.hausnummer}
-        `;
+    
+const kontaktMarkierung =
+    person.kontaktStatus === "Neuer Kontakt"
+        ? '<span class="kontakt-neu">Neuer Kontakt</span>'
+        : "";
+
+div.innerHTML = `
+    <strong>${person.nachname}</strong>
+    ${kontaktMarkierung}
+    <br>
+    ${person.strasse} ${person.hausnummer}
+`;
+
 
         div.onclick = () => zeigeDetails(person, div);
 
