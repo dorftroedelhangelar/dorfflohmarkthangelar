@@ -76,44 +76,69 @@ async function ladeVerkaeufer() {
 }
 
 
-function zeigeVerkaeufer(liste){
+function zeigeVerkaeufer(liste) {
 
     const container = document.getElementById("sellerList");
 
-document.getElementById("anzahlVerkaeufer").textContent =
-    `${liste.length} Verkäufer gefunden`;
+    document.getElementById("anzahlVerkaeufer").textContent =
+        `${liste.length} Verkäufer gefunden`;
 
-container.innerHTML = "";
+    container.innerHTML = "";
 
-    liste.forEach((person,index) => {
+    liste.forEach((person, index) => {
 
         const div = document.createElement("div");
-
         div.className = "seller-item";
 
-    
-const kontaktMarkierung =
-    person.kontaktStatus === "Neuer Kontakt"
-        ? '<span class="kontakt-neu">Neuer Kontakt</span>'
-        : "";
+        const kontaktMarkierung =
+            person.kontaktStatus === "Neuer Kontakt"
+                ? '<span class="kontakt-neu">Neuer Kontakt</span>'
+                : "";
 
-div.innerHTML = `
-    <strong>${person.nachname}</strong>
-    ${kontaktMarkierung}
-    <br>
-    ${person.strasse} ${person.hausnummer}
-`;
+        div.innerHTML = `
+            <strong></strong>
+            ${kontaktMarkierung}
+            <br>
+            <span class="seller-adresse"></span>
+        `;
 
+        // Verkäuferdaten als Text einsetzen
+        div.querySelector("strong").textContent =
+            person.nachname || "";
+
+        div.querySelector(".seller-adresse").textContent =
+            `${person.strasse || ""} ${person.hausnummer || ""}`.trim();
+
+        // Schaltfläche nur für neue Kontakte anzeigen
+        if (person.kontaktStatus === "Neuer Kontakt") {
+
+            const button = document.createElement("button");
+            button.type = "button";
+            button.textContent = "Kontakt in Google Kontakte anlegen";
+            button.className = "kontakt-anlegen-button";
+
+            button.onclick = (event) => {
+                event.stopPropagation();
+
+                alert(
+                    "Die Schaltfläche ist vorbereitet. " +
+                    "Der Aufruf zum Anlegen des Google-Kontakts " +
+                    "wird im nächsten Schritt ergänzt."
+                );
+            };
+
+            div.appendChild(button);
+        }
 
         div.onclick = () => zeigeDetails(person, div);
 
         container.appendChild(div);
 
     });
-    
-aktualisiereStatistik(liste);
 
+    aktualisiereStatistik(liste);
 }
+
 function zeigeDetails(person, element = null){
     aktiverVerkaeufer = person;
     aktivesElement = element;
