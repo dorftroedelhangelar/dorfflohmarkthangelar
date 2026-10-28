@@ -118,16 +118,21 @@ function zeigeVerkaeufer(liste) {
             button.className = "kontakt-anlegen-button";
 
             button.onclick = (event) => {
-                event.stopPropagation();
+    event.stopPropagation();
 
-                alert(
-                    "Die Schaltfläche ist vorbereitet. " +
-                    "Der Aufruf zum Anlegen des Google-Kontakts " +
-                    "wird im nächsten Schritt ergänzt."
-                );
-            };
+    const email = person.email || person.emailAdresse || "";
 
-            div.appendChild(button);
+    if (!email) {
+        alert("Für diesen Verkäufer ist keine E-Mail-Adresse hinterlegt.");
+        return;
+    }
+
+    const url = "https://script.google.com/macros/s/AKfycbzlG2AkHimGCakoG-Ip6iIijBcEIhSR4XChOEwIlrEo_mpWqIfJQakM37kkCNN9b3zP/exec";
+
+    window.open(url + "?email=" + encodeURIComponent(email), "_blank");
+};
+
+div.appendChild(button);
         }
 
         div.onclick = () => zeigeDetails(person, div);
