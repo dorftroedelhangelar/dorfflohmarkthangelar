@@ -95,13 +95,13 @@
 
             <div class="mail-toolbar">
 
-                <button
-                    id="btnAlleAuswaehlen"
-                    class="secondary-btn">
+             <button
+    id="btnAlleAuswaehlen"
+    class="secondary-btn">
 
-                    ☑️ Alle auswählen
+    ☐ Alle auswählen
 
-                </button>
+</button>
 
                 <span id="auswahlInfo">
                     0 Verkäufer ausgewählt
@@ -365,27 +365,48 @@ function zeigeListe(liste) {
    ALLE AUSWÄHLEN
 ========================================================= */
 
+function aktualisiereAlleAuswaehlenButton() {
+
+    const checkboxen = document.querySelectorAll(".seller-check");
+    const button = document.getElementById("btnAlleAuswaehlen");
+
+    const ausgewaehlt = Array.from(checkboxen)
+        .filter(cb => cb.checked).length;
+
+    if (checkboxen.length > 0 && ausgewaehlt === checkboxen.length) {
+        button.textContent = "☑ Alle auswählen";
+    } else {
+        button.textContent = "☐ Alle auswählen";
+    }
+}
+
+
+// Alle auswählen / abwählen
 document
     .getElementById("btnAlleAuswaehlen")
     .addEventListener("click", function() {
 
-        const checkboxen =
-            document.querySelectorAll(".seller-check");
+        const checkboxen = document.querySelectorAll(".seller-check");
 
         const alleAusgewaehlt =
             checkboxen.length > 0 &&
-            Array.from(checkboxen)
-                .every(cb => cb.checked);
+            Array.from(checkboxen).every(cb => cb.checked);
 
-        checkboxen.forEach(function(cb) {
-
+        checkboxen.forEach(cb => {
             cb.checked = !alleAusgewaehlt;
-
         });
 
+        aktualisiereAlleAuswaehlenButton();
         aktualisiereAuswahlInfo();
-
     });
+
+
+// Auch bei einzelner Auswahl das Symbol aktualisieren
+document.addEventListener("change", function(event) {
+    if (event.target.classList.contains("seller-check")) {
+        aktualisiereAlleAuswaehlenButton();
+    }
+});
 
 
 /* =========================================================

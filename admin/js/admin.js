@@ -11,33 +11,48 @@ async function ladeDashboard() {
             DATA_URL.replace("format=json", "format=settings")
         );
 
+        if (!settingsResponse.ok) {
+            throw new Error("Einstellungen konnten nicht geladen werden.");
+        }
+
         const settings = await settingsResponse.json();
 
-        document.getElementById("dashboardVeranstaltung").textContent =
-            settings.Veranstaltung || "Keine Veranstaltung veröffentlicht";
+        const veranstaltungElement =
+            document.getElementById("dashboardVeranstaltung");
 
-        document.getElementById("dashboardDatum").textContent =
-            "📅 " + (settings.Datum || "-");
+        const datumElement =
+            document.getElementById("dashboardDatum");
 
-        document.getElementById("dashboardUhrzeit").textContent =
-            "🕙 " + (settings.Uhrzeit || "-");
+        const uhrzeitElement =
+            document.getElementById("dashboardUhrzeit");
 
+        if (veranstaltungElement) {
+            veranstaltungElement.textContent =
+                settings.Veranstaltung || "Keine Veranstaltung veröffentlicht";
+        }
 
-     
+        if (datumElement) {
+            datumElement.textContent = "📅 " + (settings.Datum || "-");
+        }
 
+        if (uhrzeitElement) {
+            uhrzeitElement.textContent = "🕙 " + (settings.Uhrzeit || "-");
+        }
 
     } catch (err) {
 
-        console.error(
-            "Fehler beim Laden des Dashboards:",
-            err
-        );
+        console.error("Fehler beim Laden des Dashboards:", err);
 
     }
-
 }
 
+
 async function ladeVerkaeufer() {
+
+    // Nur auf der Verkäuferseite ausführen
+    if (!document.getElementById("sellerList")) {
+        return;
+    }
 
     try {
 
@@ -79,8 +94,14 @@ async function ladeVerkaeufer() {
 function zeigeVerkaeufer(liste) {
 
     const container = document.getElementById("sellerList");
+    const anzahlElement = document.getElementById("anzahlVerkaeufer");
 
-    document.getElementById("anzahlVerkaeufer").textContent =
+    // Nur auf der Verkäuferseite ausführen
+    if (!container || !anzahlElement) {
+        return;
+    }
+
+    anzahlElement.textContent =
         `${liste.length} Verkäufer gefunden`;
 
     container.innerHTML = "";
