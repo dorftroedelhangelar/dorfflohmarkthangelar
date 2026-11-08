@@ -244,3 +244,37 @@ footer{
     font-size:14px;
   }
 }
+
+/* Flyer-Bereich */
+.flyer-download {
+    max-width: 450px;
+    margin: 20px auto;
+    padding: 15px 20px;
+    text-align: center;
+    background: #f5f5f5;
+    border-radius: 10px;
+}
+
+.flyer-download h2 {
+    margin: 0 0 8px;
+    font-size: 20px;
+}
+
+.flyer-download p {
+    margin: 0 0 12px;
+    font-size: 14px;
+}
+
+.flyer-download a {
+    display: inline-block;
+    padding: 10px 18px;
+    background: #2e7d32;
+    color: white;
+    text-decoration: none;
+    border-radius: 6px;
+    font-weight: bold;
+}
+
+.flyer-download a:hover {
+    background: #1b5e20;
+}

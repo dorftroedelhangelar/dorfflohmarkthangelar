@@ -19,6 +19,17 @@ async function ladeEinstellungen() {
     document.getElementById("uhrzeit").textContent =
         "🕙 " + settings.Uhrzeit;
 
+            // Aktuellen Flyer anzeigen
+    const flyerBereich = document.getElementById("flyerBereich");
+    const flyerLink = document.getElementById("flyerLink");
+
+    if (settings.FlyerURL) {
+        flyerLink.href = settings.FlyerURL;
+        flyerBereich.style.display = "block";
+    } else {
+        flyerBereich.style.display = "none";
+    }
+
 }
 
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
