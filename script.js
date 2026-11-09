@@ -1,4 +1,4 @@
-const map = L.map('map').setView([50.7729, 7.1855], 15);
+const map = L.map('map').setView([50.7620, 7.1750], 15);
 
 let markerListe = [];
 
