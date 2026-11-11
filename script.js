@@ -61,7 +61,7 @@ async function ladeStaende() {
             iconAnchor: [18,18]
         });
 
-        const marker = L.marker(
+          const marker = L.marker(
             [
                 parseFloat(stand.breitengrad),
                 parseFloat(stand.laengengrad)
@@ -166,7 +166,19 @@ transition:0.2s;
 
     });
 
-}
+    // Kartenausschnitt automatisch an alle Stände anpassen
+    if (markerListe.length === 1) {
+        map.setView(markerListe[0].getLatLng(), 15);
+
+    } else if (markerListe.length > 1) {
+        const gruppe = L.featureGroup(markerListe);
+
+        map.fitBounds(gruppe.getBounds(), {
+            padding: [40, 40],
+            maxZoom: 15
+        });
+
+}}
 document.getElementById("search").addEventListener("input", function () {
 
     const text = this.value.toLowerCase().trim();
@@ -232,7 +244,6 @@ document.getElementById("search").addEventListener("input", function () {
     });
 
 });
-
    
 
 function filterWarengruppe(gruppe){
@@ -296,6 +307,11 @@ document.getElementById("btnListe").addEventListener("click", () => {
     });
 
 });
+
+// Druckfunktion
+document.getElementById("btnDrucken").addEventListener("click", () => {
+    window.print();
+});
 // ESC leert das Suchfeld
 document.getElementById("search").addEventListener("keydown", function (e) {
 
@@ -308,4 +324,17 @@ document.getElementById("search").addEventListener("keydown", function (e) {
 
     }
 
+});
+
+window.addEventListener("beforeprint", () => {
+    map.invalidateSize();
+
+    if (markerListe.length > 0) {
+        map.fitBounds(L.featureGroup(markerListe).getBounds(), {
+            padding: [40, 40],
+            maxZoom: 14
+        });
+
+        map.panBy([150, 0], { animate: false });
+    }
 });
