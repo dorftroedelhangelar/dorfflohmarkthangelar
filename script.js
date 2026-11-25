@@ -10,16 +10,30 @@ async function ladeEinstellungen() {
 
     const settings = await response.json();
 
-    document.getElementById("veranstaltung").textContent =
-        "🏡 " + settings.Veranstaltung;
+    const veranstaltung = document.getElementById("veranstaltung");
+    const datumBox = document.getElementById("datum").parentElement;
+    const uhrzeitBox = document.getElementById("uhrzeit").parentElement;
 
-    document.getElementById("datum").textContent =
-        "📅 " + settings.Datum;
+    if (settings.Veranstaltung) {
+        veranstaltung.textContent = "🏡 " + settings.Veranstaltung;
 
-    document.getElementById("uhrzeit").textContent =
-        "🕙 " + settings.Uhrzeit;
+        document.getElementById("datum").textContent =
+            settings.Datum;
 
-            // Aktuellen Flyer anzeigen
+        document.getElementById("uhrzeit").textContent =
+            settings.Uhrzeit;
+
+        datumBox.style.display = "flex";
+        uhrzeitBox.style.display = "flex";
+
+    } else {
+        veranstaltung.textContent = "🏡 Dorfflohmarkt Hangelar";
+
+        datumBox.style.display = "none";
+        uhrzeitBox.style.display = "none";
+    }
+
+    // Aktuellen Flyer anzeigen
     const flyerBereich = document.getElementById("flyerBereich");
     const flyerLink = document.getElementById("flyerLink");
 
@@ -31,10 +45,6 @@ async function ladeEinstellungen() {
     }
 
 }
-
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; OpenStreetMap-Mitwirkende'
-}).addTo(map);
 
 async function ladeStaende() {
 
